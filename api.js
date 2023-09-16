@@ -7,7 +7,6 @@ const port = 8080;
 const router = new Router();
 app.use(async (context, next) => {
   try {
-    console.log(Deno.cwd());
     await context.send({
       root: `${Deno.cwd()}/client`,
       index: "index.html",
@@ -25,6 +24,13 @@ function broadcast(message) {
 
 function broadcast_usernames() {
   const usernames = [...connectedClients.keys()];
+
+  broadcast(
+    JSON.stringify({
+      event: "update-users",
+      usernames: usernames,
+    })
+  );
 }
 
 router.get("/start_web_socket", async (ctx) => {
@@ -35,6 +41,34 @@ router.get("/start_web_socket", async (ctx) => {
     return;
   }
   socket.username = username;
+
   connectedClients.set(username, socket);
   console.log(`New client connected: ${username}`);
+
+  socket.onopen = () => {
+    broadcast_usernames();
+  };
+  socket.onclose = () => {
+    connectedClients.delete(socket.username);
+    console.log(`user ${socket.username} has left the chat`);
+    broadcast_usernames();
+  };
+
+  socket.onmessage = (m) => {
+    const data = JSON.parse(m.data);
+    if (data.event === "send-message") {
+      broadcast(
+        JSON.stringify({
+          event: "send-message",
+          username: socket.username,
+          message: data.message,
+        })
+      );
+    }
+  };
 });
+
+app.use(router.routes());
+
+console.log("Listening at http://localhost:" + port);
+await app.listen({ port });

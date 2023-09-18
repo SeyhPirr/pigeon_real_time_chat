@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "dev": "deno run --watch -A api.js"
+  },
+  "imports": {
+    "$std/": "https://deno.land/std@0.201.0/",
+    "oak": "https://deno.land/x/oak/mod.ts"
+  }
+}

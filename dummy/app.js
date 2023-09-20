@@ -1,9 +1,9 @@
 import { Application, Router } from "oak";
-
 const connectedClients = new Map();
+import { oakCors } from "https://deno.land/x/cors/mod.ts";
 
 const app = new Application();
-const port = 8080;
+const port = 8000;
 const router = new Router();
 app.use(async (context, next) => {
   try {
@@ -34,6 +34,10 @@ function broadcast_usernames() {
     })
   );
 }
+router.post("/login", (ctx) => {
+  console.log("hey there");
+  console.log(ctx.request.data);
+});
 
 router.get("/start_web_socket", async (ctx) => {
   const socket = await ctx.upgrade();
@@ -69,6 +73,7 @@ router.get("/start_web_socket", async (ctx) => {
     }
   };
 });
+app.use(oakCors());
 
 app.use(router.routes());
 

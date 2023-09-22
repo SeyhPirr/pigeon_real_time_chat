@@ -7,18 +7,18 @@ export default function Header(props) {
     <Box
       sx={{
         position: "sticky",
-        bgcolor: "rgba(255, 255, 255, 0.8)",
+        bgcolor: "rgba(255, 255, 255, 0.4)",
         top: 0,
         width: "auto",
         color: "red",
-        padding: "15px",
-        textDecoration: "none",
+        padding: "5px",
         borderRadius: "5px",
         zIndex: 10,
+        height: "5vh",
       }}
     >
       <Link to="/">
-        <FlutterDashSharpIcon sx={{ height: "20%", width: "4%" }} />
+        <FlutterDashSharpIcon sx={{ height: "100%", width: "4%" }} />
       </Link>
     </Box>
   );

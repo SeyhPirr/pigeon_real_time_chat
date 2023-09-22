@@ -27,7 +27,7 @@ router.get("/login", (ctx) => {
 });
 
 router.post("/login", async (ctx) => {
-  await ctx.cookies.set("jkdlkasjdkajdlkjasldjaksd", "dksjlakjsdlkjadlkjas");
+  await ctx.cookies.set("eda", "ipeksanli");
   ctx.response.status = 200;
 });
 

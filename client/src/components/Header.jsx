@@ -6,6 +6,27 @@ import { useState } from "react";
 
 export default function Header(props) {
   const [trigger, setTrigger] = useState(false);
+  const [email, setEmail] = useState("");
+  async function handleButton() {
+    try {
+      const response = await fetch("http://localhost:8000/chat/create", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email,
+        }),
+      });
+
+      console.log(response);
+      const data = await response.json();
+      console.log(data);
+    } catch (err) {
+      console.error(err);
+    }
+  }
   return (
     <Box
       sx={{
@@ -51,7 +72,7 @@ export default function Header(props) {
             width: "30%",
             height: "100%",
             position: "relative",
-            bottom: "100%",
+            bottom: "110%",
             left: "10%",
             marginLeft: "30px",
           }}
@@ -61,9 +82,16 @@ export default function Header(props) {
               background: "rgba(255,255,255,0.6)",
               width: "100%",
             }}
-            placeholder="Write the email of the user you want to start a chat."
+            placeholder="Type the email of the user you want to start a chat."
+            onChange={(event) => {
+              setEmail(event.target.value);
+            }}
+            type="email"
           />
-          <Button sx={{ position: "relative", left: "100%", bottom: "120%" }}>
+          <Button
+            sx={{ position: "relative", left: "100%", bottom: "120%" }}
+            onClick={handleButton}
+          >
             Send
           </Button>
         </Box>

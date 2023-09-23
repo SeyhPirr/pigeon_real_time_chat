@@ -41,3 +41,30 @@ export async function login(data) {
 
   if (accountPassword !== data.password) throw new Error("login error");
 }
+
+export async function createChat(session, email) {
+  const { rows } = await client.execute(
+    "SELECT * FROM session WHERE session_id=?",
+    [session]
+  );
+  const first_participant = rows[0].username;
+  const response = await client.execute("SELECT * FROM user WHERE email=?", [
+    email,
+  ]);
+  const second_participant = response.rows[0].username;
+  if (first_participant === second_participant)
+    throw new Error("You cant start a chat with yourself");
+
+  const chats = await client.execute(
+    "SELECT * FROM chat WHERE first_participant=?",
+    [first_participant]
+  );
+  console.log("chats rows", chats.rows);
+  chats.rows.forEach((row) => {
+    console.log(row.second_participant);
+  });
+  await client.execute(
+    "INSERT INTO chat(first_participant,second_participant) VALUES(?,?);",
+    [first_participant, second_participant]
+  );
+}

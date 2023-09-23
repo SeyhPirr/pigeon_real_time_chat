@@ -5,7 +5,6 @@ import { red } from "@mui/material/colors";
 import { createTheme } from "@mui/material/styles";
 import Home from "./components/Home.jsx";
 import Login from "./components/Login.jsx";
-import Header from "./components/Header.jsx";
 const theme = createTheme({
   palette: {
     primary: {
@@ -24,7 +23,6 @@ export default function App() {
           height: "100vh",
         }}
       >
-        <Header />
         {/* <Container
         sx={{
           display: "static",

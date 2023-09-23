@@ -2,7 +2,6 @@ import { Box, Button } from "@mui/material";
 import React from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
 function Popup(props) {
-  console.log(props);
   return props.trigger ? (
     <Box
       sx={{

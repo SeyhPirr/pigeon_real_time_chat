@@ -4,7 +4,6 @@ import { Box, Input, Typography, Button } from "@mui/material";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import { useForm } from "react-hook-form";
 import Popup from "./Popup";
-import Header from "./Header";
 import { Link } from "react-router-dom";
 
 function Signup() {
@@ -14,22 +13,18 @@ function Signup() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch("http://localhost:8000/signup", {
-        method: "post",
+      const response = await fetch("http://localhost:8000/account/signup", {
+        method: "POST",
         headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
+          "content-type": "application/json",
         },
-
+        credentials: "include",
         body: JSON.stringify({
           username: data.username,
           email: data.email,
           password: data.password,
         }),
       });
-      console.log(response);
-      const responseData = await response.json();
-      console.log(responseData);
       if (response.status == 200) {
         navigation.navigate("/");
       } else {

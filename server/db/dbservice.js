@@ -8,18 +8,36 @@ export const client = await new Client().connect({
   password: "root123",
 });
 
-export function assignSession(username) {
+export async function assignSession(username) {
+  await client.execute("DELETE FROM session WHERE username=?", [username]);
   const sessionID = uuid.v1.generate();
-  client.execute("INSERT INTO session(session_id,username) VALUES(?,?)", [
+  await client.execute("INSERT INTO session(session_id,username) VALUES(?,?)", [
     sessionID,
     username,
   ]);
+  return sessionID;
 }
 
-export function checkSession(sessionID) {
+export async function checkSession(sessionID) {
   const dbResponse = client.execute(
     "SELECT * FROM session WHERE session_id=?",
     [sessionID]
   );
+  console.log(dbResponse);
   return dbResponse;
+}
+
+export async function signup(data) {
+  await client.execute(
+    "INSERT INTO user(username,email,password) VALUES(?,?,?);",
+    [data.username, data.email, data.password]
+  );
+}
+export async function login(data) {
+  const { rows } = await client.execute("SELECT * FROM user WHERE username=?", [
+    data.username,
+  ]);
+  const accountPassword = rows[0].password;
+
+  if (accountPassword !== data.password) throw new Error("login error");
 }

@@ -4,7 +4,6 @@ import { Box, Input, Typography, Button } from "@mui/material";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import { useForm } from "react-hook-form";
 import Popup from "./Popup";
-import Header from "./Header";
 import { Link } from "react-router-dom";
 function Login() {
   const { register, handleSubmit } = useForm();
@@ -13,10 +12,10 @@ function Login() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch("http://localhost:8000/login", {
+      const response = await fetch("http://localhost:8000/account/login", {
         method: "POST",
         headers: {
-          "content-type": "API-Key",
+          "content-type": "application/json",
         },
         credentials: "include",
         body: JSON.stringify({
@@ -27,7 +26,7 @@ function Login() {
 
       console.log(response);
       if (response.status == 200) {
-        // navigation.navigate("/");
+        navigation.navigate("/");
       } else {
         setError("You couldn`t login.");
         setPopup(true);
@@ -88,7 +87,6 @@ function Login() {
             <SendOutlinedIcon />
           </Button>
           <Link to="/signup">
-            {" "}
             <Typography
               sx={{
                 color: "rgba(255,255,255,0.8)",

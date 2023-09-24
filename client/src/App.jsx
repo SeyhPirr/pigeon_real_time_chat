@@ -5,6 +5,8 @@ import { red } from "@mui/material/colors";
 import { createTheme } from "@mui/material/styles";
 import Home from "./components/Home.jsx";
 import Login from "./components/Login.jsx";
+import Header from "./components/Header.jsx";
+import ChatContext from "./components/chat/ChatContext.jsx";
 const theme = createTheme({
   palette: {
     primary: {
@@ -23,23 +25,15 @@ export default function App() {
           height: "100vh",
         }}
       >
-        {/* <Container
-        sx={{
-          display: "static",
-          bgcolor: "rgba(30, 139, 195)",
-          height: "100vh",
-          width: "auto",
-          justifyContent: "center",
-          alignItems: "stretch",
-          top: 0,
-        }}
-      > */}
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-        </Routes>
-        {/* / </Container> */}
+        <ChatContext>
+          <Header />
+
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
+          </Routes>
+        </ChatContext>
       </Box>
     </BrowserRouter>
   );

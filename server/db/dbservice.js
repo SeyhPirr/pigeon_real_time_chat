@@ -19,12 +19,12 @@ export async function assignSession(username) {
 }
 
 export async function checkSession(sessionID) {
-  const dbResponse = client.execute(
+  const dbResponse = await client.execute(
     "SELECT * FROM session WHERE session_id=?",
     [sessionID]
   );
-  console.log(dbResponse);
-  return dbResponse;
+  if (dbResponse.rows[0].username) return true;
+  return false;
 }
 
 export async function signup(data) {

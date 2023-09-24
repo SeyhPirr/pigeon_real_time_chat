@@ -2,11 +2,13 @@ import { Box, Button, IconButton, Input, TextField } from "@mui/material";
 import { Link } from "react-router-dom";
 import FlutterDashSharpIcon from "@mui/icons-material/FlutterDashSharp";
 import MapsUgcIcon from "@mui/icons-material/MapsUgc";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { Context } from "./chat/ChatContext";
 
 export default function Header(props) {
   const [trigger, setTrigger] = useState(false);
   const [email, setEmail] = useState("");
+  const [chatCreated, setChatCreated] = useContext(Context);
   async function handleButton() {
     try {
       const response = await fetch("http://localhost:8000/chat/create", {
@@ -21,6 +23,7 @@ export default function Header(props) {
       });
 
       console.log(response);
+      if (response.status === 200) setChatCreated(true);
       const data = await response.json();
       console.log(data);
     } catch (err) {
@@ -85,6 +88,9 @@ export default function Header(props) {
             placeholder="Type the email of the user you want to start a chat."
             onChange={(event) => {
               setEmail(event.target.value);
+            }}
+            onKeyDown={(e) => {
+              if ((e.key = "Enter")) handleButton();
             }}
             type="email"
           />

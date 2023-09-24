@@ -39,7 +39,6 @@ function Login() {
 
   return (
     <Box>
-      <Header />
       <Popup trigger={popup} setTrigger={setPopup}>
         {error}
       </Popup>

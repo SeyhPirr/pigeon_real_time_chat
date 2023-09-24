@@ -1,8 +1,7 @@
 import React from "react";
-import { Box, Input } from "@mui/material";
-import { Paper, TextField } from "@mui/material";
+import { Paper } from "@mui/material";
 
-function Chat(props) {
+function Chat() {
   return (
     <Paper
       sx={{

@@ -44,18 +44,19 @@ export default function Header(props) {
         height: "5vh",
       }}
     >
-      <Link to="/">
-        <FlutterDashSharpIcon
-          sx={{
-            color: "blue",
-            height: "100%",
-            width: "4%",
-            ":hover": {
-              color: "red",
-            },
-          }}
-        />
-      </Link>
+      <FlutterDashSharpIcon
+        sx={{
+          color: "blue",
+          height: "100%",
+          width: "4%",
+          ":hover": {
+            color: "red",
+          },
+        }}
+        onClick={() => {
+          navigation.navigate("/");
+        }}
+      />
       <MapsUgcIcon
         onClick={() => {
           setTrigger(!trigger);
@@ -90,7 +91,7 @@ export default function Header(props) {
               setEmail(event.target.value);
             }}
             onKeyDown={(e) => {
-              if ((e.key = "Enter")) handleButton();
+              if (e.key == "Enter") handleButton();
             }}
             type="email"
           />

@@ -23,8 +23,8 @@ export async function checkSession(sessionID) {
     "SELECT * FROM session WHERE session_id=?",
     [sessionID]
   );
-  if (dbResponse.rows[0].username) return true;
-  return false;
+  if (dbResponse.rows[0].username) return false;
+  return dbResponse.rows[0].username;
 }
 
 export async function signup(data) {
@@ -55,16 +55,25 @@ export async function createChat(session, email) {
   if (first_participant === second_participant)
     throw new Error("You cant start a chat with yourself");
 
-  const chats = await client.execute(
+  const firstChats = await client.execute(
     "SELECT * FROM chat WHERE first_participant=?",
     [first_participant]
   );
-  console.log("chats rows", chats.rows);
-  chats.rows.forEach((row) => {
-    console.log(row.second_participant);
+  firstChats.rows.forEach((row) => {
+    if (row.second_participant === second_participant)
+      throw new Error("Chat already exists.");
+  });
+  const secondChats = await client.execute(
+    "SELECT * FROM chat WHERE first_participant=?",
+    [second_participant]
+  );
+  secondChats.rows.forEach((row) => {
+    if (row.second_participant === first_participant)
+      throw new Error("Chat already exists.");
   });
   await client.execute(
     "INSERT INTO chat(first_participant,second_participant) VALUES(?,?);",
     [first_participant, second_participant]
   );
 }
+export async function getData() {}

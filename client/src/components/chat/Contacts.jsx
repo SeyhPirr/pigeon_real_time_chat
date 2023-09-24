@@ -2,11 +2,12 @@ import React from "react";
 import { Paper } from "@mui/material";
 function Contacts() {
   let contacts = [];
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 19; i++) {
     contacts.push(
       <Paper
         elevation={1}
         sx={{ color: "grey", fontSize: "24px", padding: "5px", margin: "5px" }}
+        key={i}
       >
         Mehmet yuksel
       </Paper>
@@ -24,7 +25,7 @@ function Contacts() {
       }}
     >
       <Paper elevation={2}>
-        <h1 style={{ color: "Blue" }}>Contacts</h1>
+        <h1 style={{ color: "grey" }}>Contacts</h1>
       </Paper>
       {contacts}
     </Paper>

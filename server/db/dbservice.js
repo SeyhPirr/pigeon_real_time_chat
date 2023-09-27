@@ -92,7 +92,7 @@ export async function insertMessage(data) {
 
 export async function getMessages(first_participant, second_participant) {
   const messageData = await client.execute(
-    "SELECT * FROM message WHERE( sender=? AND receiver=?) OR (sender=? AND receiver=?) ",
+    "SELECT * FROM message WHERE( sender=? AND receiver=?) OR (sender=? AND receiver=?) ORDER BY id ASC ",
     [
       first_participant,
       second_participant,

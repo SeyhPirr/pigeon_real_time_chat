@@ -6,7 +6,7 @@ export const Context = React.createContext();
 function ChatContext(props) {
   const [chats, setChats] = useState([]);
   const [email, setEmail] = useState("");
-  const [chatViewID, setChatViewID] = useState(false);
+  const [chatViewID, setChatViewID] = useState("");
 
   return (
     <Context.Provider

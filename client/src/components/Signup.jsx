@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Header from "./Header";
 
 import { Box, Input, Typography, Button } from "@mui/material";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";

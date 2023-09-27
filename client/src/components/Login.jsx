@@ -5,7 +5,6 @@ import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import { useForm } from "react-hook-form";
 import Popup from "./Popup";
 import { Link } from "react-router-dom";
-import Header from "./Header";
 function Login() {
   const { register, handleSubmit } = useForm();
   const [popup, setPopup] = useState(false);

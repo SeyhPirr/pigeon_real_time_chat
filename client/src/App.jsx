@@ -1,19 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Signup from "./components/Signup.jsx";
-import { Box, Container } from "@mui/material";
-import { red } from "@mui/material/colors";
-import { createTheme } from "@mui/material/styles";
+import { Box } from "@mui/material";
 import Home from "./components/Home.jsx";
 import Login from "./components/Login.jsx";
 import Header from "./components/Header.jsx";
 import ChatContext from "./components/chat/ChatContext.jsx";
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: red[500],
-    },
-  },
-});
 
 export default function App() {
   return (

@@ -6,7 +6,7 @@ import { Context } from "./ChatContext";
 import { useContext } from "react";
 
 function ChatCard() {
-  const { chatViewID, setChatViewID } = useContext(Context);
+  const { chatViewID } = useContext(Context);
   return (
     <Box
       sx={{

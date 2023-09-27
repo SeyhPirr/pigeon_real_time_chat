@@ -2,8 +2,11 @@ import { Box, TextField } from "@mui/material";
 import React from "react";
 import Contacts from "./Contacts";
 import Chat from "./Chat";
+import { Context } from "./ChatContext";
+import { useContext } from "react";
 
 function ChatCard() {
+  const { chatViewID, setChatViewID } = useContext(Context);
   return (
     <Box
       sx={{
@@ -15,7 +18,7 @@ function ChatCard() {
       }}
     >
       <Contacts />
-      <Chat />
+      {chatViewID ? <Chat /> : ""}
     </Box>
   );
 }

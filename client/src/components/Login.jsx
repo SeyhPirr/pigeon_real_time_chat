@@ -25,7 +25,6 @@ function Login() {
         }),
       });
 
-      console.log(response);
       if (response.status == 200) {
         navigation.navigate("/");
       } else {

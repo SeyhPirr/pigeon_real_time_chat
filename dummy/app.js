@@ -52,12 +52,11 @@ router.get("/start_web_socket", async (ctx) => {
   console.log(`New client connected: ${username}`);
 
   socket.onopen = () => {
-    broadcast_usernames();
+    console.log("opened");
   };
   socket.onclose = () => {
     connectedClients.delete(socket.username);
     console.log(`user ${socket.username} has left the chat`);
-    broadcast_usernames();
   };
 
   socket.onmessage = (m) => {

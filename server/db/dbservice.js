@@ -23,8 +23,8 @@ export async function checkSession(sessionID) {
     "SELECT * FROM session WHERE session_id=?",
     [sessionID]
   );
-  if (dbResponse.rows[0].username) return false;
-  return dbResponse.rows[0].username;
+  if (!dbResponse.rows[0].username) return false;
+  return dbResponse.rows[0];
 }
 
 export async function signup(data) {
@@ -63,17 +63,44 @@ export async function createChat(session, email) {
     if (row.second_participant === second_participant)
       throw new Error("Chat already exists.");
   });
-  const secondChats = await client.execute(
-    "SELECT * FROM chat WHERE first_participant=?",
-    [second_participant]
+  const first_id = new Date();
+  const chat = await client.execute(
+    "INSERT INTO chat(id,first_participant,second_participant) VALUES(?,?,?);",
+    [first_id, first_participant, second_participant]
   );
-  secondChats.rows.forEach((row) => {
-    if (row.second_participant === first_participant)
-      throw new Error("Chat already exists.");
-  });
+  const second_id = new Date();
   await client.execute(
-    "INSERT INTO chat(first_participant,second_participant) VALUES(?,?);",
-    [first_participant, second_participant]
+    "INSERT INTO chat(id,first_participant,second_participant) VALUES(?,?,?);",
+    [second_id, second_participant, first_participant]
+  );
+  return { id: first_id, first_participant, second_participant };
+}
+export async function getChats(username) {
+  const chatData = await client.execute(
+    "SELECT * FROM chat WHERE first_participant = ?",
+    [username]
+  );
+  return chatData.rows;
+}
+
+export async function insertMessage(data) {
+  await client.execute(
+    "INSERT INTO message(sender,receiver,content) VALUES(?,?,?);",
+    [data.sender, data.reciever, data.content]
   );
 }
-export async function getData() {}
+
+export async function getMessages(first_participant, second_participant) {
+  const messageData = await client.execute(
+    "SELECT * FROM message WHERE( sender=? AND receiver=?) OR (sender=? AND receiver=?) ",
+    [
+      first_participant,
+      second_participant,
+      second_participant,
+      first_participant,
+    ]
+  );
+  console.log(first_participant, second_participant);
+  console.log(messageData.rows);
+  return messageData.rows;
+}

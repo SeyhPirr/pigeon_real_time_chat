@@ -25,15 +25,21 @@ export default function App() {
           height: "100vh",
         }}
       >
-        <ChatContext>
-          <Header />
+        <Header />
 
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-          </Routes>
-        </ChatContext>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ChatContext>
+                <Home />
+              </ChatContext>
+            }
+          />
+
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
       </Box>
     </BrowserRouter>
   );

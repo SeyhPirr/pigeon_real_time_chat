@@ -4,7 +4,6 @@ const account = new Router();
 account.post("/login", async (ctx) => {
   try {
     const data = await ctx.request.body().value;
-    console.log("DATA:", data);
     await login(data);
     const sessionID = await assignSession(data.username);
     await ctx.cookies.set("session", sessionID);
@@ -20,7 +19,6 @@ account.post("/login", async (ctx) => {
 account.post("/signup", async (ctx) => {
   try {
     const data = await ctx.request.body().value;
-    console.log("DATA:", data);
     await signup(data);
     const sessionID = await assignSession(data.username);
     await ctx.cookies.set("session", sessionID);

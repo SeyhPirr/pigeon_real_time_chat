@@ -1,35 +1,6 @@
-import { Box, Button, IconButton, Input, TextField } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Box } from "@mui/material";
 import FlutterDashSharpIcon from "@mui/icons-material/FlutterDashSharp";
-import MapsUgcIcon from "@mui/icons-material/MapsUgc";
-import { useContext, useState } from "react";
-import { Context } from "./chat/ChatContext";
-
-export default function Header(props) {
-  const [trigger, setTrigger] = useState(false);
-  const [email, setEmail] = useState("");
-  const [chatCreated, setChatCreated] = useContext(Context);
-  async function handleButton() {
-    try {
-      const response = await fetch("http://localhost:8000/chat/create", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          email,
-        }),
-      });
-
-      console.log(response);
-      if (response.status === 200) setChatCreated(true);
-      const data = await response.json();
-      console.log(data);
-    } catch (err) {
-      console.error(err);
-    }
-  }
+export default function Header() {
   return (
     <Box
       sx={{
@@ -57,54 +28,6 @@ export default function Header(props) {
           navigation.navigate("/");
         }}
       />
-      <MapsUgcIcon
-        onClick={() => {
-          setTrigger(!trigger);
-          console.log(trigger);
-        }}
-        sx={{
-          color: "blue",
-
-          ":hover": {
-            color: "red",
-          },
-        }}
-      />
-      {trigger ? (
-        <Box
-          sx={{
-            width: "30%",
-            height: "100%",
-            position: "relative",
-            bottom: "110%",
-            left: "10%",
-            marginLeft: "30px",
-          }}
-        >
-          <Input
-            sx={{
-              background: "rgba(255,255,255,0.6)",
-              width: "100%",
-            }}
-            placeholder="Type the email of the user you want to start a chat."
-            onChange={(event) => {
-              setEmail(event.target.value);
-            }}
-            onKeyDown={(e) => {
-              if (e.key == "Enter") handleButton();
-            }}
-            type="email"
-          />
-          <Button
-            sx={{ position: "relative", left: "100%", bottom: "120%" }}
-            onClick={handleButton}
-          >
-            Send
-          </Button>
-        </Box>
-      ) : (
-        ""
-      )}
     </Box>
   );
 }

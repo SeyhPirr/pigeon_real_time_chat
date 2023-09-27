@@ -1,33 +1,38 @@
 import React, { useContext, useEffect } from "react";
-import { Box, TextField } from "@mui/material";
-import { Context } from "./chat/ChatContext";
+import { Box } from "@mui/material";
 import ChatCard from "./chat/ChatCard";
-function Home(props) {
-  const [chatCreated, setChatCreated] = useContext(Context);
-  console.log(chatCreated);
-  if (!chatCreated) navigation.navigate("/login");
+import { Context } from "./chat/ChatContext";
+function Home() {
+  const { setChats, email } = useContext(Context);
 
-  return chatCreated ? (
+  async function getChats() {
+    try {
+      const response = await fetch("http://localhost:8000/chat/", {
+        method: "GET",
+        headers: {
+          "content-type": "application/json",
+        },
+        credentials: "include",
+      });
+      const data = await response.json();
+      setChats(data.chats);
+
+      if (response.status !== 200) {
+        navigation.navigate("/login");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  if (window.location.pathname === "/") {
+    useEffect(() => {
+      getChats();
+    }, [email]);
+  }
+  return (
     <Box>
       <ChatCard />
-      <Box
-        sx={{
-          position: "absolute",
-          top: "89.5vh",
-          height: "8vh",
-          left: "28.1vw",
-        }}
-      >
-        <TextField
-          sx={{ width: "66.70vw", bgcolor: "rgba(255,255,255,0.6)" }}
-          onKeyDown={(e) => {
-            if (e.key == "Enter") console.log("submit");
-          }}
-        />
-      </Box>
     </Box>
-  ) : (
-    ""
   );
 }
 

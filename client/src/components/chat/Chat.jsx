@@ -57,8 +57,9 @@ function Chat() {
 
     ws.current.onmessage = (e) => {
       console.log("hey there");
-      getMessages();
       const message = JSON.parse(e.data);
+      getMessages();
+
       console.log("MESSAGE:", message);
     };
   }, [isPaused]);

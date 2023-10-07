@@ -7,10 +7,20 @@ function ChatContext(props) {
   const [chats, setChats] = useState([]);
   const [email, setEmail] = useState("");
   const [chatViewID, setChatViewID] = useState("");
+  const [currentContact, setCurrentContact] = useState("");
 
   return (
     <Context.Provider
-      value={{ chats, setChats, email, setEmail, chatViewID, setChatViewID }}
+      value={{
+        chats,
+        setChats,
+        email,
+        setEmail,
+        chatViewID,
+        setChatViewID,
+        currentContact,
+        setCurrentContact,
+      }}
     >
       <Box>{props.children}</Box>
     </Context.Provider>

@@ -47,60 +47,54 @@ export async function createChat(session, email) {
     "SELECT * FROM session WHERE session_id=?",
     [session]
   );
-  const first_participant = rows[0].username;
+  const participant_1 = rows[0].username;
   const response = await client.execute("SELECT * FROM user WHERE email=?", [
     email,
   ]);
-  const second_participant = response.rows[0].username;
-  if (first_participant === second_participant)
+
+  const participant_2 = response.rows[0].username;
+
+  if (participant_1 === participant_2)
     throw new Error("You cant start a chat with yourself");
 
-  const firstChats = await client.execute(
-    "SELECT * FROM chat WHERE first_participant=?",
-    [first_participant]
+  const chats = await client.execute(
+    "SELECT * FROM chat WHERE (participant_1=? AND participant_2=?) OR (participant_1 =? AND participant_2=?)",
+    [participant_1, participant_2, participant_2, participant_1]
   );
-  firstChats.rows.forEach((row) => {
-    if (row.second_participant === second_participant)
-      throw new Error("Chat already exists.");
-  });
-  const first_id = new Date();
-  const chat = await client.execute(
-    "INSERT INTO chat(id,first_participant,second_participant) VALUES(?,?,?);",
-    [first_id, first_participant, second_participant]
-  );
-  const second_id = new Date();
+
+  if (chats.rows[0]?.participant_1) throw new Error("Chat already exists!");
+  const chatID = uuid.v1.generate();
+
   await client.execute(
-    "INSERT INTO chat(id,first_participant,second_participant) VALUES(?,?,?);",
-    [second_id, second_participant, first_participant]
+    "INSERT INTO chat(id,participant_1,participant_2) VALUES(?,?,?)",
+    [chatID, participant_1, participant_2]
   );
-  return { id: first_id, first_participant, second_participant };
+  return { id: chatID, participant_1, participant_2 };
 }
-export async function getChats(username) {
+export async function getChats(username, session) {
+  const { rows } = await client.execute(
+    "SELECT * FROM session WHERE session_id=?",
+    [session]
+  );
+  const currentUser = rows[0].username;
   const chatData = await client.execute(
-    "SELECT * FROM chat WHERE first_participant = ?",
-    [username]
+    "SELECT id, IF(participant_1=? ,participant_2 , participant_1 )as contact FROM chat WHERE participant_1 = ? OR participant_2 = ?",
+    [currentUser, username, username]
   );
   return chatData.rows;
 }
 
 export async function insertMessage(data) {
   await client.execute(
-    "INSERT INTO message(sender,receiver,content) VALUES(?,?,?);",
-    [data.sender, data.reciever, data.content]
+    "INSERT INTO message(chat_id,content,sender) VALUES(?,?,?);",
+    [data.chat_id, data.content, data.sender]
   );
 }
 
-export async function getMessages(first_participant, second_participant) {
+export async function getMessages(chat_id) {
   const messageData = await client.execute(
-    "SELECT * FROM message WHERE( sender=? AND receiver=?) OR (sender=? AND receiver=?) ORDER BY id ASC ",
-    [
-      first_participant,
-      second_participant,
-      second_participant,
-      first_participant,
-    ]
+    "SELECT * FROM message WHERE chat_id=?  ORDER BY id ASC ",
+    [chat_id]
   );
-  console.log(first_participant, second_participant);
-  console.log(messageData.rows);
   return messageData.rows;
 }

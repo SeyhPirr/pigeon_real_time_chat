@@ -1,24 +1,31 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Paper, Box, TextField, Typography } from "@mui/material";
+import { Paper, Box, TextField, Typography, Input } from "@mui/material";
 import { Context } from "./ChatContext";
 import { useContext } from "react";
+import MessageList from "./MessageList";
 function Chat() {
-  const { chatViewID } = useContext(Context);
+  const { chatViewID, currentContact } = useContext(Context);
   const [currentChat, setCurrentChat] = useState(null);
   const [inputValue, setInputValue] = useState("");
   const [isPaused, setPause] = useState(false);
+  const [messageExists, setMessageExist] = useState(false);
+
+  let Chat = [];
   const ws = useRef(null);
+
+  // start connection ************
   useEffect(() => {
-    ws.current = new WebSocket(`ws://localhost:8000/chat/connect`);
+    ws.current = new WebSocket(
+      `ws://localhost:8000/chat/connect?chatID=${chatViewID}`
+    );
     ws.current.onopen = () => console.log("ws opened");
     ws.current.onclose = () => console.log("ws closed");
-    const wsCurrent = ws.current;
   }, []);
-
+  // get old messages***********************
   async function getMessages() {
     try {
       const response = await fetch(
-        `http://localhost:8000/chat/messages?receiver=${chatViewID}`,
+        `http://localhost:8000/chat/messages?chatID=${chatViewID}`,
         {
           method: "GET",
           headers: {
@@ -29,47 +36,37 @@ function Chat() {
       );
       const data = await response.json();
       console.log(data);
-      setCurrentChat(
-        data.messages.map((messageData) => {
-          if (messageData.sender === chatViewID)
-            return <Box key={messageData.id}>{messageData.content}</Box>;
-          if (messageData.sender !== chatViewID)
-            return (
-              <Box
-                key={messageData.id}
-                sx={{ position: "relative", left: "70%" }}
-              >
-                {messageData.content}
-              </Box>
-            );
-        })
-      );
+      if (response.status === 200) {
+        setMessageExist(true);
+        setCurrentChat(data.messages);
+      }
+      console.log("CHAT INSIDE:", Chat);
     } catch (err) {
       console.error(err);
     }
   }
+  // execute get messages
   useEffect(() => {
     getMessages();
-  }, [isPaused, chatViewID]);
-
+  }, [chatViewID]);
+  //control on message
   useEffect(() => {
     if (!ws.current) return;
 
     ws.current.onmessage = (e) => {
-      console.log("hey there");
       const message = JSON.parse(e.data);
-      getMessages();
-
       console.log("MESSAGE:", message);
+      console.log(currentChat);
+      setCurrentChat([...currentChat, message]);
     };
-  }, [isPaused]);
+  }, []);
 
   function sendMessage() {
     ws.current.send(
       JSON.stringify({
-        event: "send-message",
         message: inputValue,
-        reciever: chatViewID,
+        reciever: currentContact,
+        chat_id: chatViewID,
       })
     );
   }
@@ -91,9 +88,11 @@ function Chat() {
         }}
       >
         <Paper elevation={2}>
-          <h1 style={{ color: "grey" }}>{chatViewID}</h1>
+          <h1 style={{ color: "grey" }}>{currentContact}</h1>
         </Paper>
-        <Box sx={{ width: "100%", height: "100%" }}> {currentChat}</Box>
+        <Box sx={{ width: "100%", height: "100%" }}>
+          {messageExists ? <MessageList messages={currentChat} /> : ""}
+        </Box>
       </Paper>
       <Box
         sx={{
@@ -103,8 +102,13 @@ function Chat() {
           left: "28.1vw",
         }}
       >
-        <TextField
-          sx={{ width: "460%", bgcolor: "rgba(255,255,255,0.6)" }}
+        <Input
+          sx={{
+            width: "70vw",
+            bgcolor: "rgba(255,255,255,0.6)",
+            position: "absolute",
+            bottom: "0vh",
+          }}
           onChange={(event) => {
             setInputValue(event.target.value);
           }}

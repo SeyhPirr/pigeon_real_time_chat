@@ -6,11 +6,11 @@
 
 CREATE TABLE message(
     id INTEGER UNIQUE NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    sender VARCHAR(255) UNIQUE NOT NULL ,
-    receiver VARCHAR(255) UNIQUE NOT NULL,
+    sender VARCHAR(255)  NOT NULL ,
+    chat_id VARCHAR(255) NOT NULL,
     content TEXT,   
     FOREIGN KEY(sender) REFERENCES user(username) ON DELETE CASCADE ,
-    FOREIGN KEY(receiver) REFERENCES user(username) ON DELETE CASCADE 
+    FOREIGN KEY(chat_id) REFERENCES chat(id) ON DELETE CASCADE
 );
 
 CREATE TABLE session(
@@ -21,8 +21,8 @@ CREATE TABLE session(
 
 CREATE TABLE chat(
     id VARCHAR(255) NOT NULL PRIMARY KEY,
-    owner VARCHAR(255) UNIQUE NOT NULL,
-    participant VARCHAR(255) UNIQUE NOT NULL,
+    participant_1 VARCHAR(255) UNIQUE NOT NULL,
+    participant_2 VARCHAR(255) UNIQUE NOT NULL,
     FOREIGN KEY(owner) REFERENCES user(username) ON DELETE CASCADE ,
     FOREIGN KEY(participant) REFERENCES user(username) ON DELETE CASCADE 
 );

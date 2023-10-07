@@ -6,7 +6,7 @@ import { useState } from "react";
 import MapsUgcIcon from "@mui/icons-material/MapsUgc";
 
 function Contacts() {
-  const { chats, setChats, email, setEmail, setChatViewID } =
+  const { chats, setChats, email, setEmail, setChatViewID, setCurrentContact } =
     useContext(Context);
   const [trigger, setTrigger] = useState(false);
   async function handleButton() {
@@ -109,13 +109,13 @@ function Contacts() {
             },
           }}
           key={chat.id}
-          id={chat.second_participant}
+          id={chat.id}
           onClick={(event) => {
-            console.log(event.target.id);
             setChatViewID(event.target.id);
+            setCurrentContact(chat.contact);
           }}
         >
-          {chat.second_participant}
+          {chat.contact}
         </Paper>
       ))}
     </Paper>

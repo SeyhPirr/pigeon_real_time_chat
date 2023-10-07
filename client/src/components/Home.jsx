@@ -15,6 +15,7 @@ function Home() {
         credentials: "include",
       });
       const data = await response.json();
+      console.log(data);
       setChats(data.chats);
 
       if (response.status !== 200) {

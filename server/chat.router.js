@@ -8,7 +8,6 @@ import {
   insertMessage,
   getMessages,
 } from "./db/dbservice.js";
-const connectedClients = new Map();
 
 chat.post("/create", async (ctx) => {
   try {
@@ -26,10 +25,10 @@ chat.post("/create", async (ctx) => {
 
 chat.get("/", async (ctx) => {
   try {
-    const sessionId = await ctx.cookies.get("session");
-    const dbResponse = await checkSession(sessionId);
+    const sessionID = await ctx.cookies.get("session");
+    const dbResponse = await checkSession(sessionID);
     if (dbResponse) {
-      const chats = await getChats(dbResponse.username);
+      const chats = await getChats(dbResponse.username, sessionID);
       ctx.response.body = { chats };
     }
   } catch (err) {
@@ -38,14 +37,21 @@ chat.get("/", async (ctx) => {
     ctx.response.status = 401;
   }
 });
-function broadcast(reciever, message) {
-  console.log(reciever);
-  for (const client of connectedClients) {
-    if (client[0] == reciever) {
-      console.log("hey there");
+let Clients = [];
 
-      client[1].send(message);
+function broadcast(chatID, message) {
+  Clients.forEach((client) => {
+    if (client.chatID == chatID) {
+      if (client.socket.readyState === 1) client.socket.send(message);
+      else return;
     }
+  });
+}
+
+function remove(value) {
+  const index = Clients.indexOf(value);
+  if (index > -1) {
+    Clients.splice(index, 1);
   }
 }
 chat.get("/connect", async (ctx) => {
@@ -53,43 +59,46 @@ chat.get("/connect", async (ctx) => {
   const sessionID = await ctx.cookies.get("session");
   const dbResponse = await checkSession(sessionID);
   const username = dbResponse.username;
-  connectedClients.set(username, socket);
   console.log(`New client connected: ${username}`);
+  const chatID = ctx.request.url.searchParams.get("chatID");
+  console.log(chatID);
+  Clients.push({ username, chatID, socket });
 
   socket.onclose = () => {
     console.log(`Client ${username} disconnected`);
-    connectedClients.delete(username);
+    remove({ username, chatID, socket });
   };
+
+  ////on message logic
   socket.onmessage = async (m) => {
     const data = JSON.parse(m.data);
-    console.log(data);
     await insertMessage({
-      sender: username,
-      reciever: data.reciever,
+      chat_id: chatID,
       content: data.message,
+      sender: username,
     });
-    switch (data.event) {
-      case "send-message":
-        broadcast(
-          data.reciever,
-          JSON.stringify({
-            event: "send-message",
-            username: socket.username,
-            message: data.message,
-          })
-        );
-        break;
-    }
+    const messageID = Date.now();
+
+    broadcast(
+      chatID,
+      JSON.stringify({
+        id: messageID,
+        chat_id: chatID,
+        sender: username,
+        content: data.message,
+      })
+    );
   };
 });
 chat.get("/messages", async (ctx) => {
   try {
     const sessionId = await ctx.cookies.get("session");
     const dbResponse = await checkSession(sessionId);
-    const receiver = ctx.request.url.searchParams.get("receiver");
-    console.log(receiver);
+    const chatID = ctx.request.url.searchParams.get("chatID");
+    console.log(chatID);
     if (dbResponse) {
-      const messages = await getMessages(dbResponse.username, receiver);
+      const messages = await getMessages(chatID);
+      console.log(messages);
       ctx.response.body = { messages };
     }
   } catch (err) {

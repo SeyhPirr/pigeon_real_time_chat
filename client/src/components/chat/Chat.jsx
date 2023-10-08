@@ -1,27 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Paper, Box, TextField, Typography, Input } from "@mui/material";
+import { Paper, Box, Input } from "@mui/material";
 import { Context } from "./ChatContext";
 import { useContext } from "react";
 import MessageList from "./MessageList";
 function Chat() {
-  const { chatViewID, currentContact } = useContext(Context);
+  const { chatViewID, currentContact, webSocket } = useContext(Context);
   const [currentChat, setCurrentChat] = useState(null);
   const [inputValue, setInputValue] = useState("");
-  const [isPaused, setPause] = useState(false);
   const [messageExists, setMessageExist] = useState(false);
 
-  let Chat = [];
-  const ws = useRef(null);
-
-  // start connection ************
-  useEffect(() => {
-    ws.current = new WebSocket(
-      `ws://localhost:8000/chat/connect?chatID=${chatViewID}`
-    );
-    ws.current.onopen = () => console.log("ws opened");
-    ws.current.onclose = () => console.log("ws closed");
-  }, []);
-  // get old messages***********************
   async function getMessages() {
     try {
       const response = await fetch(
@@ -37,10 +24,9 @@ function Chat() {
       const data = await response.json();
       console.log(data);
       if (response.status === 200) {
-        setMessageExist(true);
         setCurrentChat(data.messages);
+        setMessageExist(true);
       }
-      console.log("CHAT INSIDE:", Chat);
     } catch (err) {
       console.error(err);
     }
@@ -50,19 +36,14 @@ function Chat() {
     getMessages();
   }, [chatViewID]);
   //control on message
-  useEffect(() => {
-    if (!ws.current) return;
-
-    ws.current.onmessage = (e) => {
+  if (webSocket)
+    webSocket.onmessage = (e) => {
       const message = JSON.parse(e.data);
-      console.log("MESSAGE:", message);
-      console.log(currentChat);
       setCurrentChat([...currentChat, message]);
     };
-  }, []);
 
   function sendMessage() {
-    ws.current.send(
+    webSocket.send(
       JSON.stringify({
         message: inputValue,
         reciever: currentContact,
@@ -114,7 +95,6 @@ function Chat() {
           }}
           onKeyDown={(e) => {
             if (e.key == "Enter") {
-              setPause(!isPaused);
               sendMessage();
               e.target.value = "";
             }

@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 export const Context = React.createContext();
 
@@ -8,6 +8,29 @@ function ChatContext(props) {
   const [email, setEmail] = useState("");
   const [chatViewID, setChatViewID] = useState("");
   const [currentContact, setCurrentContact] = useState("");
+  const [webSocket, setWebSocket] = useState(null);
+
+  const closeWebSocket = () => {
+    if (webSocket && chatViewID) {
+      console.log("websokcet closed");
+
+      webSocket.close();
+      setWebSocket(null);
+    }
+  };
+  const openWebsocket = (chatID) => {
+    closeWebSocket();
+    const newWebSocket = new WebSocket(
+      `ws://localhost:8000/chat/connect?chatID=${chatID}`
+    );
+
+    newWebSocket.onopen = () => console.log("ws opened");
+    newWebSocket.onclose = () => console.log("ws closed");
+    setWebSocket(newWebSocket);
+  };
+  useEffect(() => {
+    if (chatViewID) openWebsocket(chatViewID);
+  }, [chatViewID]);
 
   return (
     <Context.Provider
@@ -20,6 +43,7 @@ function ChatContext(props) {
         setChatViewID,
         currentContact,
         setCurrentContact,
+        webSocket,
       }}
     >
       <Box>{props.children}</Box>

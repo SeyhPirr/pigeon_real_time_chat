@@ -2,17 +2,7 @@ import React from "react";
 import { Box } from "@mui/material";
 import { useContext } from "react";
 import { Context } from "./ChatContext";
-// Chat.map((item) => {
-//     if (item.sender === currentContact)
-//       return (
-//
-//       );
-//     else {
-//       return (
-//
-//       );
-//     }
-//   })
+
 function MessageItem({ message }) {
   const { currentContact } = useContext(Context);
   if (message.sender === currentContact) {

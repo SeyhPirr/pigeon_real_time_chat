@@ -18,19 +18,20 @@ function ChatContext(props) {
       setWebSocket(null);
     }
   };
-  const openWebsocket = (chatID) => {
-    closeWebSocket();
-    const newWebSocket = new WebSocket(
-      `ws://localhost:8000/chat/connect?chatID=${chatID}`
-    );
+  const openWebsocket = () => {
+    const newWebSocket = new WebSocket(`ws://localhost:8000/chat/connect`);
 
     newWebSocket.onopen = () => console.log("ws opened");
     newWebSocket.onclose = () => console.log("ws closed");
     setWebSocket(newWebSocket);
   };
   useEffect(() => {
-    if (chatViewID) openWebsocket(chatViewID);
-  }, [chatViewID]);
+    openWebsocket();
+    return () => {
+      console.log("CLEANUP");
+      closeWebSocket();
+    };
+  }, []);
 
   return (
     <Context.Provider

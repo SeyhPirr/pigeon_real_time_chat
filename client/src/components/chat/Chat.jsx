@@ -39,17 +39,20 @@ function Chat() {
   if (webSocket)
     webSocket.onmessage = (e) => {
       const message = JSON.parse(e.data);
+      console.log(message);
       setCurrentChat([...currentChat, message]);
     };
 
   function sendMessage() {
-    webSocket.send(
-      JSON.stringify({
-        message: inputValue,
-        reciever: currentContact,
-        chat_id: chatViewID,
-      })
-    );
+    if (inputValue)
+      webSocket.send(
+        JSON.stringify({
+          event: "send-message",
+          message: inputValue,
+          reciever: currentContact,
+          chat_id: chatViewID,
+        })
+      );
   }
 
   //////***********************************************************
@@ -97,6 +100,7 @@ function Chat() {
             if (e.key == "Enter") {
               sendMessage();
               e.target.value = "";
+              setInputValue("");
             }
           }}
         />

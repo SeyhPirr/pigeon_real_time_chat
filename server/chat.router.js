@@ -39,55 +39,72 @@ chat.get("/", async (ctx) => {
 });
 let Clients = [];
 
-function broadcast(chatID, message) {
+function broadcast(chat_id, message) {
   Clients.forEach((client) => {
-    if (client.chatID == chatID) {
+    if (client.chat_id == chat_id) {
       if (client.socket.readyState === 1) client.socket.send(message);
       else return;
     }
   });
 }
 
-function remove(value) {
-  const index = Clients.indexOf(value);
+function remove(username) {
+  let counter = 0;
+  let index;
+  Clients.forEach((client) => {
+    if (client.username === username) {
+      index = counter;
+    }
+    counter++;
+  });
+  console.log(index);
   if (index > -1) {
     Clients.splice(index, 1);
   }
+  console.log("inside remove", Clients);
 }
 chat.get("/connect", async (ctx) => {
   const socket = await ctx.upgrade();
   const sessionID = await ctx.cookies.get("session");
   const dbResponse = await checkSession(sessionID);
   const username = dbResponse.username;
+  console.log(username);
+  console.log("hey there");
   console.log(`New client connected: ${username}`);
-  const chatID = ctx.request.url.searchParams.get("chatID");
-  console.log(chatID);
-  Clients.push({ username, chatID, socket });
+  console.log(Clients);
 
   socket.onclose = () => {
     console.log(`Client ${username} disconnected`);
-    remove({ username, chatID, socket });
+    remove(username);
+    console.log(Clients);
   };
 
   ////on message logic
   socket.onmessage = async (m) => {
     const data = JSON.parse(m.data);
-    await insertMessage({
-      chat_id: chatID,
-      content: data.message,
-      sender: username,
-    });
-    const messageID = Date.now();
-
-    broadcast(
-      chatID,
-      JSON.stringify({
-        id: messageID,
-        chat_id: chatID,
-        sender: username,
+    if (data.event === "send-message") {
+      await insertMessage({
+        chat_id: data.chat_id,
         content: data.message,
-      })
-    );
+        sender: username,
+      });
+      const messageID = Date.now();
+
+      broadcast(
+        data.chat_id,
+        JSON.stringify({
+          id: messageID,
+          chat_id: data.chat_id,
+          sender: username,
+          content: data.message,
+        })
+      );
+    }
+    if (data.event === "assign-chat") {
+      remove(username);
+
+      Clients.push({ username, chat_id: data.chat_id, socket });
+    }
   };
 });
 chat.get("/messages", async (ctx) => {
@@ -95,10 +112,8 @@ chat.get("/messages", async (ctx) => {
     const sessionId = await ctx.cookies.get("session");
     const dbResponse = await checkSession(sessionId);
     const chatID = ctx.request.url.searchParams.get("chatID");
-    console.log(chatID);
     if (dbResponse) {
       const messages = await getMessages(chatID);
-      console.log(messages);
       ctx.response.body = { messages };
     }
   } catch (err) {

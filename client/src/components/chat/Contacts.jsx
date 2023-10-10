@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Paper, Box, Input, Button } from "@mui/material";
 import { Context } from "./ChatContext";
 import { useContext } from "react";
@@ -13,9 +13,22 @@ function Contacts() {
     setEmail,
     setChatViewID,
     setCurrentContact,
-    currenContact,
+    webSocket,
+    chatViewID,
   } = useContext(Context);
   const [trigger, setTrigger] = useState(false);
+  function assignChat() {
+    if (webSocket)
+      webSocket.send(
+        JSON.stringify({
+          event: "assign-chat",
+          chat_id: chatViewID,
+        })
+      );
+  }
+  useEffect(() => {
+    if (chatViewID) assignChat();
+  }, [chatViewID]);
   async function handleButton() {
     try {
       const response = await fetch("http://localhost:8000/chat/create", {

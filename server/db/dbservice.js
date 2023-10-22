@@ -33,6 +33,7 @@ export async function signup(data) {
     [data.username, data.email, data.password]
   );
 }
+
 export async function login(data) {
   const { rows } = await client.execute("SELECT * FROM user WHERE username=?", [
     data.username,
@@ -69,8 +70,9 @@ export async function createChat(session, email) {
     "INSERT INTO chat(id,participant_1,participant_2) VALUES(?,?,?)",
     [chatID, participant_1, participant_2]
   );
-  return { id: chatID, participant_1, participant_2 };
+  return { id: chatID, contact: participant_2 };
 }
+
 export async function getChats(username, session) {
   const { rows } = await client.execute(
     "SELECT * FROM session WHERE session_id=?",

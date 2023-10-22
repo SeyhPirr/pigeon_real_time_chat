@@ -25,11 +25,11 @@ function Home() {
       console.error(err);
     }
   }
-  if (window.location.pathname === "/") {
-    useEffect(() => {
-      getChats();
-    }, [email]);
-  }
+
+  useEffect(() => {
+    getChats();
+  }, [email]);
+
   return (
     <Box>
       <ChatCard />

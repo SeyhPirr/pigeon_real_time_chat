@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { Box } from "@mui/material";
+import UseWebsocket from "../../hooks/useWebsocket";
 export const Context = React.createContext();
 
 function ChatContext(props) {
@@ -8,31 +9,17 @@ function ChatContext(props) {
   const [email, setEmail] = useState("");
   const [chatViewID, setChatViewID] = useState("");
   const [currentContact, setCurrentContact] = useState("");
-  const [webSocket, setWebSocket] = useState(null);
-
-  const closeWebSocket = () => {
-    if (webSocket && chatViewID) {
-      console.log("websokcet closed");
-
-      webSocket.close();
-      setWebSocket(null);
-    }
-  };
-  const openWebsocket = () => {
-    const newWebSocket = new WebSocket(`ws://localhost:8000/chat/connect`);
-
-    newWebSocket.onopen = () => console.log("ws opened");
-    newWebSocket.onclose = () => console.log("ws closed");
-    setWebSocket(newWebSocket);
-  };
+  const { openWebSocket, closeWebSocket, sendMessage, onMessage, assignChat } =
+    UseWebsocket();
   useEffect(() => {
-    openWebsocket();
+    openWebSocket();
     return () => {
-      console.log("CLEANUP");
       closeWebSocket();
     };
   }, []);
-
+  useEffect(() => {
+    if (chatViewID) assignChat(chatViewID);
+  }, [chatViewID]);
   return (
     <Context.Provider
       value={{
@@ -44,7 +31,9 @@ function ChatContext(props) {
         setChatViewID,
         currentContact,
         setCurrentContact,
-        webSocket,
+        sendMessage,
+        onMessage,
+        assignChat,
       }}
     >
       <Box>{props.children}</Box>

@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Paper, Box, Input, Button } from "@mui/material";
 import { Context } from "./ChatContext";
 import { useContext } from "react";
 import { useState } from "react";
 import MapsUgcIcon from "@mui/icons-material/MapsUgc";
+import ContactCard from "./ContactCard";
 
 function Contacts() {
   const {
@@ -13,22 +14,10 @@ function Contacts() {
     setEmail,
     setChatViewID,
     setCurrentContact,
-    webSocket,
-    chatViewID,
+    currentContact,
   } = useContext(Context);
   const [trigger, setTrigger] = useState(false);
-  function assignChat() {
-    if (webSocket)
-      webSocket.send(
-        JSON.stringify({
-          event: "assign-chat",
-          chat_id: chatViewID,
-        })
-      );
-  }
-  useEffect(() => {
-    if (chatViewID) assignChat();
-  }, [chatViewID]);
+
   async function handleButton() {
     try {
       const response = await fetch("http://localhost:8000/chat/create", {
@@ -43,6 +32,7 @@ function Contacts() {
       });
 
       const data = await response.json();
+      console.log(data);
       const newArray = [...chats];
       newArray.push(data);
 
@@ -117,27 +107,13 @@ function Contacts() {
         )}
       </Paper>
       {chats.map((chat) => (
-        <Paper
-          elevation={1}
-          sx={{
-            color: "grey",
-            fontSize: "24px",
-            padding: "5px",
-            margin: "5px",
-            ":hover": {
-              bgcolor: "rgba(240,240,240)",
-            },
-          }}
+        <ContactCard
           key={chat.id}
-          id={chat.id}
-          onClick={(event) => {
-            console.log(chat.contact, chat.id);
-            setChatViewID(event.target.id);
-            setCurrentContact(chat.contact);
-          }}
-        >
-          {chat.contact}
-        </Paper>
+          chat={chat}
+          setChatViewID={setChatViewID}
+          setCurrentContact={setCurrentContact}
+          currentContact={currentContact}
+        />
       ))}
     </Paper>
   );

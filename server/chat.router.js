@@ -70,8 +70,6 @@ chat.get("/connect", async (ctx) => {
   const username = dbResponse.username;
   console.log(username);
   console.log("hey there");
-  console.log(`New client connected: ${username}`);
-  console.log(Clients);
 
   socket.onclose = () => {
     console.log(`Client ${username} disconnected`);
@@ -102,6 +100,7 @@ chat.get("/connect", async (ctx) => {
     }
     if (data.event === "assign-chat") {
       remove(username);
+      console.log(`New client connected: ${username}`);
 
       Clients.push({ username, chat_id: data.chat_id, socket });
     }

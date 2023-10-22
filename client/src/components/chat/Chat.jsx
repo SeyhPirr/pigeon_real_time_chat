@@ -1,59 +1,36 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Paper, Box, Input } from "@mui/material";
 import { Context } from "./ChatContext";
 import { useContext } from "react";
 import MessageList from "./MessageList";
+import UseMessages from "../../hooks/useMessages";
 function Chat() {
-  const { chatViewID, currentContact, webSocket } = useContext(Context);
-  const [currentChat, setCurrentChat] = useState(null);
+  const { chatViewID, currentContact, sendMessage, onMessage } =
+    useContext(Context);
+  const [messages, setMessages] = useState(null);
   const [inputValue, setInputValue] = useState("");
   const [messageExists, setMessageExist] = useState(false);
+  const { getMessages } = UseMessages();
 
-  async function getMessages() {
-    try {
-      const response = await fetch(
-        `http://localhost:8000/chat/messages?chatID=${chatViewID}`,
-        {
-          method: "GET",
-          headers: {
-            "content-type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-      const data = await response.json();
-      console.log(data);
-      if (response.status === 200) {
-        setCurrentChat(data.messages);
-        setMessageExist(true);
-      }
-    } catch (err) {
-      console.error(err);
+  async function displayMessages() {
+    const responseMessages = await getMessages(chatViewID);
+    if (responseMessages) {
+      console.log(responseMessages);
+      setMessageExist(true);
+      setMessages(responseMessages);
     }
   }
-  // execute get messages
+
   useEffect(() => {
-    getMessages();
+    displayMessages();
   }, [chatViewID]);
   //control on message
-  if (webSocket)
-    webSocket.onmessage = (e) => {
-      const message = JSON.parse(e.data);
-      console.log(message);
-      setCurrentChat([...currentChat, message]);
-    };
-
-  function sendMessage() {
-    if (inputValue)
-      webSocket.send(
-        JSON.stringify({
-          event: "send-message",
-          message: inputValue,
-          reciever: currentContact,
-          chat_id: chatViewID,
-        })
-      );
-  }
+  onMessage((e) => {
+    console.log("onMessage CHAT   ");
+    const message = JSON.parse(e.data);
+    console.log(message);
+    setMessages([...messages, message]);
+  });
 
   //////***********************************************************
   return (
@@ -75,7 +52,7 @@ function Chat() {
           <h1 style={{ color: "grey" }}>{currentContact}</h1>
         </Paper>
         <Box sx={{ width: "100%", height: "100%" }}>
-          {messageExists ? <MessageList messages={currentChat} /> : ""}
+          {messageExists ? <MessageList messages={messages} /> : ""}
         </Box>
       </Paper>
       <Box
@@ -98,9 +75,18 @@ function Chat() {
           }}
           onKeyDown={(e) => {
             if (e.key == "Enter") {
-              sendMessage();
-              e.target.value = "";
-              setInputValue("");
+              if (inputValue) {
+                sendMessage(
+                  JSON.stringify({
+                    event: "send-message",
+                    message: inputValue,
+                    reciever: currentContact,
+                    chat_id: chatViewID,
+                  })
+                );
+                e.target.value = "";
+                setInputValue("");
+              }
             }
           }}
         />

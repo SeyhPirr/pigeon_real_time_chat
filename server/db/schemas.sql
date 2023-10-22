@@ -21,8 +21,8 @@ CREATE TABLE session(
 
 CREATE TABLE chat(
     id VARCHAR(255) NOT NULL PRIMARY KEY,
-    participant_1 VARCHAR(255) UNIQUE NOT NULL,
-    participant_2 VARCHAR(255) UNIQUE NOT NULL,
+    participant_1 VARCHAR(255)  NOT NULL,
+    participant_2 VARCHAR(255)  NOT NULL,
     FOREIGN KEY(owner) REFERENCES user(username) ON DELETE CASCADE ,
     FOREIGN KEY(participant) REFERENCES user(username) ON DELETE CASCADE 
 );

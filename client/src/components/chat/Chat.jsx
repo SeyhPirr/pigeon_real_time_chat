@@ -7,37 +7,33 @@ import UseMessages from "../../hooks/useMessages";
 function Chat() {
   const { chatViewID, currentContact, sendMessage, onMessage } =
     useContext(Context);
-  const [messages, setMessages] = useState(null);
   const [inputValue, setInputValue] = useState("");
-  const [messageExists, setMessageExist] = useState(false);
   const { getMessages } = UseMessages();
-
-  async function displayMessages() {
-    const responseMessages = await getMessages(chatViewID);
-    if (responseMessages) {
-      console.log(responseMessages);
-      setMessageExist(true);
-      setMessages(responseMessages);
-    }
+  const [messageRecieved, setMessageRecieved] = useState(false);
+  let messages;
+  if (!messages) {
+    messages = getMessages(chatViewID);
   }
-
-  useEffect(() => {
-    displayMessages();
-  }, [chatViewID]);
-  //control on message
   onMessage((e) => {
     console.log("onMessage CHAT   ");
     const message = JSON.parse(e.data);
     console.log(message);
-    setMessages([...messages, message]);
+    messages.push(message);
+    setMessageRecieved(!messageRecieved);
   });
 
   //////***********************************************************
   return (
     <Box sx={{ width: "100%", height: "100%" }}>
       <Paper
+        sx={{ position: "absolute", left: "28%", width: "70%" }}
+        elevation={2}
+      >
+        <h1 style={{ color: "grey" }}>{currentContact}</h1>
+      </Paper>
+      <Paper
         sx={{
-          height: "90vh",
+          height: "83.3vh",
           overflow: "auto",
           marginTop: "1%",
           width: "70%",
@@ -46,13 +42,11 @@ function Chat() {
           bgcolor: "rgba(255,255,255,0.6)",
           position: "absolute",
           left: "25%",
+          top: "8%",
         }}
       >
-        <Paper elevation={2}>
-          <h1 style={{ color: "grey" }}>{currentContact}</h1>
-        </Paper>
         <Box sx={{ width: "100%", height: "100%" }}>
-          {messageExists ? <MessageList messages={messages} /> : ""}
+          {messages ? <MessageList messages={messages} /> : ""}
         </Box>
       </Paper>
       <Box

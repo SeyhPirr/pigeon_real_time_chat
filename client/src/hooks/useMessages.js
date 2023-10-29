@@ -1,5 +1,8 @@
+import { useEffect, useState } from "react";
+
 function UseMessages() {
-  async function getMessages(chatID) {
+  const [messages, setMessages] = useState(null);
+  async function fetchMessages(chatID) {
     try {
       const response = await fetch(
         `http://localhost:8000/chat/messages?chatID=${chatID}`,
@@ -14,11 +17,17 @@ function UseMessages() {
       const data = await response.json();
       console.log(data);
       if (response.status === 200) {
-        return data.messages;
+        setMessages(data.messages);
       }
     } catch (err) {
       console.error(err);
     }
+  }
+  function getMessages(chatID) {
+    useEffect(() => {
+      fetchMessages(chatID);
+    }, [chatID]);
+    return messages;
   }
 
   return {

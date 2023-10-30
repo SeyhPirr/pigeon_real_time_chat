@@ -11,15 +11,65 @@ function ChatContext(props) {
   const [currentContact, setCurrentContact] = useState("");
   const { openWebSocket, closeWebSocket, sendMessage, onMessage, assignChat } =
     UseWebsocket();
+  // websocket open and close logic
   useEffect(() => {
     openWebSocket();
     return () => {
       closeWebSocket();
     };
   }, []);
+  // assignChat
   useEffect(() => {
     if (chatViewID) assignChat(chatViewID);
   }, [chatViewID]);
+  // get chats logic
+  async function getChats() {
+    try {
+      const response = await fetch("http://localhost:8000/chat/", {
+        method: "GET",
+        headers: {
+          "content-type": "application/json",
+        },
+        credentials: "include",
+      });
+      const data = await response.json();
+      console.log(data);
+      setChats(data.chats);
+
+      if (response.status !== 200) {
+        navigation.navigate("/login");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  //get chats execute
+  useEffect(() => {
+    getChats();
+  }, []);
+  // create chat logic
+  async function createChat() {
+    try {
+      const response = await fetch("http://localhost:8000/chat/create", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.status === 200) {
+        setChats([...chats, data]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
   return (
     <Context.Provider
       value={{
@@ -34,6 +84,7 @@ function ChatContext(props) {
         sendMessage,
         onMessage,
         assignChat,
+        createChat,
       }}
     >
       <Box>{props.children}</Box>

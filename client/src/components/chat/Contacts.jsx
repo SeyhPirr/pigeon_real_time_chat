@@ -6,42 +6,9 @@ import { useState } from "react";
 import MapsUgcIcon from "@mui/icons-material/MapsUgc";
 import ContactCard from "./ContactCard";
 function Contacts() {
-  const {
-    chats,
-    setChats,
-    email,
-    setEmail,
-    setChatViewID,
-    setCurrentContact,
-    currentContact,
-  } = useContext(Context);
+  const { chats, setEmail, setChatViewID, setCurrentContact, createChat } =
+    useContext(Context);
   const [trigger, setTrigger] = useState(false);
-
-  async function handleButton() {
-    try {
-      const response = await fetch("http://localhost:8000/chat/create", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          email,
-        }),
-      });
-
-      const data = await response.json();
-      console.log(data);
-      const newArray = [...chats];
-      newArray.push(data);
-
-      if (response.status === 200) {
-        setChats(newArray);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }
 
   return (
     <Paper
@@ -85,7 +52,7 @@ function Contacts() {
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  handleButton();
+                  createChat();
                   setTrigger(false);
                 }
               }}
@@ -94,7 +61,7 @@ function Contacts() {
             <Button
               sx={{ position: "relative", left: "110%", bottom: "50%" }}
               onClick={() => {
-                handleButton();
+                createChat();
                 setTrigger(false);
               }}
             >
@@ -109,9 +76,10 @@ function Contacts() {
         <ContactCard
           key={chat.id}
           chat={chat}
-          setChatViewID={setChatViewID}
-          setCurrentContact={setCurrentContact}
-          currentContact={currentContact}
+          onClickFunction={(event) => {
+            setChatViewID(event.target.id);
+            setCurrentContact(chat.contact);
+          }}
         />
       ))}
     </Paper>

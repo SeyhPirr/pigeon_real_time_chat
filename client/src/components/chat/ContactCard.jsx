@@ -1,7 +1,7 @@
 import { Paper } from "@mui/material";
 import React from "react";
 
-function ContactCard(props) {
+function ContactCard({ chat, onClickFunction }) {
   return (
     <Paper
       elevation={1}
@@ -14,14 +14,10 @@ function ContactCard(props) {
           bgcolor: "rgba(240,240,240)",
         },
       }}
-      id={props.chat.id}
-      onClick={(event) => {
-        console.log(props.chat.contact, props.chat.id);
-        props.setChatViewID(event.target.id);
-        props.setCurrentContact(props.chat.contact);
-      }}
+      id={chat.id}
+      onClick={onClickFunction}
     >
-      {props.chat.contact}
+      {chat.contact}
     </Paper>
   );
 }

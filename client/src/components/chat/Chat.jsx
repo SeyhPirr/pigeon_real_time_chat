@@ -11,9 +11,11 @@ function Chat() {
   const { getMessages } = UseMessages();
   const [messageRecieved, setMessageRecieved] = useState(false);
   let messages;
+
   if (!messages) {
     messages = getMessages(chatViewID);
   }
+
   onMessage((e) => {
     console.log("onMessage CHAT   ");
     const message = JSON.parse(e.data);

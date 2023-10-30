@@ -39,9 +39,9 @@ chat.get("/", async (ctx) => {
 });
 let Clients = [];
 
-function broadcast(chat_id, message) {
+function broadcast(reciever, sender, message) {
   Clients.forEach((client) => {
-    if (client.chat_id == chat_id) {
+    if (reciever === client.username || sender === client.username) {
       if (client.socket.readyState === 1) client.socket.send(message);
       else return;
     }
@@ -68,9 +68,7 @@ chat.get("/connect", async (ctx) => {
   const sessionID = await ctx.cookies.get("session");
   const dbResponse = await checkSession(sessionID);
   const username = dbResponse.username;
-  console.log(username);
-  console.log("hey there");
-
+  Clients.push({ username, socket });
   socket.onclose = () => {
     console.log(`Client ${username} disconnected`);
     remove(username);
@@ -89,7 +87,8 @@ chat.get("/connect", async (ctx) => {
       const messageID = Date.now();
 
       broadcast(
-        data.chat_id,
+        data.reciever,
+        username,
         JSON.stringify({
           id: messageID,
           chat_id: data.chat_id,
@@ -97,12 +96,6 @@ chat.get("/connect", async (ctx) => {
           content: data.message,
         })
       );
-    }
-    if (data.event === "assign-chat") {
-      remove(username);
-      console.log(`New client connected: ${username}`);
-
-      Clients.push({ username, chat_id: data.chat_id, socket });
     }
   };
 });

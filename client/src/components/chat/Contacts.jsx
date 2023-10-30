@@ -5,7 +5,6 @@ import { useContext } from "react";
 import { useState } from "react";
 import MapsUgcIcon from "@mui/icons-material/MapsUgc";
 import ContactCard from "./ContactCard";
-
 function Contacts() {
   const {
     chats,

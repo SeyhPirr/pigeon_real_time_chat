@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import UseWebsocket from "../../hooks/useWebsocket";
+import useMessages from "../../hooks/useMessages";
 export const Context = React.createContext();
 
 function ChatContext(props) {
@@ -9,8 +10,37 @@ function ChatContext(props) {
   const [email, setEmail] = useState("");
   const [chatViewID, setChatViewID] = useState("");
   const [currentContact, setCurrentContact] = useState("");
-  const { openWebSocket, closeWebSocket, sendMessage, onMessage, assignChat } =
+  const [inputValue, setInputValue] = useState("");
+  const [notification, setNotification] = useState(null);
+  const { openWebSocket, closeWebSocket, onMessage, webSocket } =
     UseWebsocket();
+  const { getMessages, appendMessage } = useMessages();
+  let messages;
+
+  if (!messages) {
+    messages = getMessages(chatViewID);
+  }
+
+  function sendMessage() {
+    webSocket.send(
+      JSON.stringify({
+        event: "send-message",
+        message: inputValue,
+        reciever: currentContact,
+        chat_id: chatViewID,
+      })
+    );
+  }
+
+  onMessage((e) => {
+    const message = JSON.parse(e.data);
+    console.log(message);
+    if (chatViewID === message.chat_id) appendMessage(message);
+    else {
+      setNotification(`${message.sender}: ${message.content}`);
+    }
+  });
+
   // websocket open and close logic
   useEffect(() => {
     openWebSocket();
@@ -18,10 +48,7 @@ function ChatContext(props) {
       closeWebSocket();
     };
   }, []);
-  // assignChat
-  useEffect(() => {
-    if (chatViewID) assignChat(chatViewID);
-  }, [chatViewID]);
+
   // get chats logic
   async function getChats() {
     try {
@@ -74,17 +101,17 @@ function ChatContext(props) {
     <Context.Provider
       value={{
         chats,
-        setChats,
-        email,
         setEmail,
         chatViewID,
         setChatViewID,
         currentContact,
         setCurrentContact,
         sendMessage,
-        onMessage,
-        assignChat,
         createChat,
+        messages,
+        setInputValue,
+        notification,
+        setNotification,
       }}
     >
       <Box>{props.children}</Box>

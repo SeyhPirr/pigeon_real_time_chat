@@ -30,8 +30,13 @@ function UseMessages() {
     return messages;
   }
 
+  function appendMessage(message) {
+    setMessages([...messages, message]);
+  }
+
   return {
     getMessages,
+    appendMessage,
   };
 }
 export default UseMessages;

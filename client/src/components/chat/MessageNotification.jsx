@@ -1,7 +1,7 @@
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import React from "react";
 
-function MessageNotification() {
+function MessageNotification({ notification, setNotification }) {
   return (
     <Box
       sx={{
@@ -13,9 +13,18 @@ function MessageNotification() {
         top: "0",
         zIndex: "10px",
         borderRadius: "10px",
+        color: "white",
+        fontSize: "25px",
       }}
     >
-      selamlar
+      {notification}
+      <Button
+        onClick={() => {
+          setNotification("");
+        }}
+      >
+        close
+      </Button>
     </Box>
   );
 }

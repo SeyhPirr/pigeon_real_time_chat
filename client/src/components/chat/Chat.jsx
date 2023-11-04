@@ -1,28 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Paper, Box, Input } from "@mui/material";
 import { Context } from "./ChatContext";
 import { useContext } from "react";
 import MessageList from "./MessageList";
-import UseMessages from "../../hooks/useMessages";
 function Chat() {
-  const { chatViewID, currentContact, sendMessage, onMessage } =
+  const { currentContact, messages, setInputValue, sendMessage } =
     useContext(Context);
-  const [inputValue, setInputValue] = useState("");
-  const { getMessages } = UseMessages();
-  const [messageRecieved, setMessageRecieved] = useState(false);
-  let messages;
-
-  if (!messages) {
-    messages = getMessages(chatViewID);
-  }
-
-  onMessage((e) => {
-    console.log("onMessage CHAT   ");
-    const message = JSON.parse(e.data);
-    console.log(message);
-    messages.push(message);
-    setMessageRecieved(!messageRecieved);
-  });
 
   //////***********************************************************
   return (
@@ -71,18 +54,10 @@ function Chat() {
           }}
           onKeyDown={(e) => {
             if (e.key == "Enter") {
-              if (inputValue) {
-                sendMessage(
-                  JSON.stringify({
-                    event: "send-message",
-                    message: inputValue,
-                    reciever: currentContact,
-                    chat_id: chatViewID,
-                  })
-                );
-                e.target.value = "";
-                setInputValue("");
-              }
+              console.log("entered");
+              sendMessage();
+              e.target.value = "";
+              setInputValue("");
             }
           }}
         />

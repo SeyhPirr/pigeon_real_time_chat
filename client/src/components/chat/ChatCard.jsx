@@ -4,9 +4,10 @@ import Contacts from "./Contacts";
 import Chat from "./Chat";
 import { Context } from "./ChatContext";
 import { useContext } from "react";
+import MessageNotification from "./MessageNotification";
 
 function ChatCard() {
-  const { chatViewID } = useContext(Context);
+  const { chatViewID, notification, setNotification } = useContext(Context);
   return (
     <Box
       sx={{
@@ -19,6 +20,14 @@ function ChatCard() {
     >
       <Contacts />
       {chatViewID ? <Chat /> : ""}
+      {notification ? (
+        <MessageNotification
+          notification={notification}
+          setNotification={setNotification}
+        />
+      ) : (
+        ""
+      )}
     </Box>
   );
 }

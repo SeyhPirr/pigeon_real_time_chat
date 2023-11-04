@@ -19,10 +19,33 @@ CREATE TABLE session(
     FOREIGN KEY(username) REFERENCES user(username) ON DELETE CASCADE
 );
 
-CREATE TABLE chat(
+CREATE TABLE chat_participance(
     id VARCHAR(255) NOT NULL PRIMARY KEY,
-    participant_1 VARCHAR(255)  NOT NULL,
-    participant_2 VARCHAR(255)  NOT NULL,
-    FOREIGN KEY(owner) REFERENCES user(username) ON DELETE CASCADE ,
+    chat_id VARCHAR(255) NOT NULL,
+    participant VARCHAR(255) NOT NULL,
+    FOREIGN KEY(chat_id) REFERENCES chat(id) ON DELETE CASCADE ,
     FOREIGN KEY(participant) REFERENCES user(username) ON DELETE CASCADE 
+);
+
+CREATE TABLE group_chat(
+    id VARCHAR(255) NOT NULL PRIMARY KEY,
+    group_name VARCHAR(255) NOT NULL,
+);
+
+
+CREATE TABLE group_participance(
+    id VARCHAR(255) NOT NULL PRIMARY KEY,
+    group_chat_id VARCHAR(255) NOT NULL,
+    participant VARCHAR(255) NOT NULL,
+    FOREIGN KEY(group_chat_id) REFERENCES group_chat(id) ON DELETE CASCADE ,
+    FOREIGN KEY(participant) REFERENCES user(username) ON DELETE CASCADE 
+);
+
+CREATE TABLE group_message(
+    id INTEGER UNIQUE NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    sender VARCHAR(255)  NOT NULL ,
+    group_chat_id VARCHAR(255) NOT NULL,
+    content TEXT,   
+    FOREIGN KEY(sender) REFERENCES user(username) ON DELETE CASCADE ,
+    FOREIGN KEY(group_chat_id) REFERENCES group(id) ON DELETE CASCADE
 );

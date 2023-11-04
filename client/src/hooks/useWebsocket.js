@@ -14,32 +14,17 @@ function UseWebsocket() {
     if (chatID && webSocket) webSocket.close();
   }
   function onMessage(onMessageFunction) {
-    console.log("ON MESSAGE HEY THERE");
     if (webSocket)
       webSocket.onmessage = (e) => {
         onMessageFunction(e);
       };
   }
-  function sendMessage(message) {
-    console.log("WEBSOCKET", webSocket);
-    webSocket.send(message);
-  }
 
-  function assignChat(chatID) {
-    if (webSocket)
-      webSocket.send(
-        JSON.stringify({
-          event: "assign-chat",
-          chat_id: chatID,
-        })
-      );
-  }
   return {
     openWebSocket,
     closeWebSocket,
-    sendMessage,
     onMessage,
-    assignChat,
+    webSocket,
   };
 }
 

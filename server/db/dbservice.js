@@ -59,37 +59,39 @@ export async function createChat(session, email) {
     throw new Error("You cant start a chat with yourself");
 
   const chats = await client.execute(
-    "SELECT * FROM chat WHERE (participant_1=? AND participant_2=?) OR (participant_1 =? AND participant_2=?)",
-    [participant_1, participant_2, participant_2, participant_1]
+    "SELECT chat_id, COUNT(*) FROM participance where username=? or username=? GROUP BY chat_id HAVING COUNT(*) > 1 ;",
+    [participant_1, participant_2]
   );
-
-  if (chats.rows[0]?.participant_1) throw new Error("Chat already exists!");
+  console.log(chats);
+  if (chats.rows[1]) throw new Error("Chat already exists!");
   const chatID = uuid.v1.generate();
 
+  await client.execute("INSERT INTO chat(id,chat_type) VALUES(?,?)", [
+    chatID,
+    "individual",
+  ]);
+
   await client.execute(
-    "INSERT INTO chat(id,participant_1,participant_2) VALUES(?,?,?)",
-    [chatID, participant_1, participant_2]
+    "INSERT INTO participance(username,chat_id,participance_type) VALUES(?,?,?),(?,?,?)",
+    [participant_1, chatID, "individual", participant_2, chatID, "individual"]
   );
   return { id: chatID, contact: participant_2 };
 }
 
-export async function getChats(username, session) {
-  const { rows } = await client.execute(
-    "SELECT * FROM session WHERE session_id=?",
-    [session]
-  );
-  const currentUser = rows[0].username;
+export async function getChats(username) {
   const chatData = await client.execute(
-    "SELECT id, IF(participant_1=? ,participant_2 , participant_1 )as contact FROM chat WHERE participant_1 = ? OR participant_2 = ?",
-    [currentUser, username, username]
+    "SELECT p.* FROM participance p JOIN ( SELECT chat_id FROM participance WHERE username = ? ) AS subquery  ON p.chat_id = subquery.chat_id AND p.username <> ?",
+    [username]
   );
+
   return chatData.rows;
 }
 
 export async function insertMessage(data) {
+  const now = new Date();
   await client.execute(
-    "INSERT INTO message(chat_id,content,sender) VALUES(?,?,?);",
-    [data.chat_id, data.content, data.sender]
+    "INSERT INTO message(chat_id,content,sender,creation_time) VALUES(?,?,?,?);",
+    [data.chat_id, data.content, data.sender, now]
   );
 }
 

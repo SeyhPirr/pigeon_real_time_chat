@@ -28,7 +28,8 @@ chat.get("/", async (ctx) => {
     const sessionID = await ctx.cookies.get("session");
     const dbResponse = await checkSession(sessionID);
     if (dbResponse) {
-      const chats = await getChats(dbResponse.username, sessionID);
+      const chats = await getChats(dbResponse.username);
+      console.log(chats);
       ctx.response.body = { chats };
     }
   } catch (err) {

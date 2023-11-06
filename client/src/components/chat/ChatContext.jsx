@@ -64,7 +64,7 @@ function ChatContext(props) {
       setChats(data.chats);
 
       if (response.status !== 200) {
-        navigation.navigate("/login");
+        //navigation.navigate("/login");
       }
     } catch (err) {
       console.error(err);

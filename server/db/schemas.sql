@@ -18,13 +18,14 @@ CREATE TABLE chat(
 );
 
 CREATE TABLE participance(
+	id INTEGER auto_increment primary key,
     username VARCHAR(255) NOT NULL,
     chat_id VARCHAR(255) NOT NULL,
-    is_admin BOOLEAN NOT NULL,
+    participance_type ENUM("individual","group") NOT NULL,
     FOREIGN KEY(username) REFERENCES user(username),
     FOREIGN KEY(chat_id) REFERENCES chat(id)
-
 );
+
 CREATE TABLE message(
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
     chat_id VARCHAR(255) NOT NULL,
@@ -35,9 +36,14 @@ CREATE TABLE message(
     FOREIGN KEY(sender) REFERENCES user(username)
 );
 
-CREATE TABLE group(
+CREATE TABLE group_chat(
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
     chat_id VARCHAR(255) NOT NULL,
     group_name VARCHAR(255) NOT NULL,
     FOREIGN KEY(chat_id) REFERENCES chat(id) 
-)
+);
+CREATE TABLE group_participance(
+    participance_id INTEGER NOT NULL,
+    is_admin BOOLEAN NOT NULL,
+    FOREIGN KEY(participance_id) REFERENCES participance(id)
+);

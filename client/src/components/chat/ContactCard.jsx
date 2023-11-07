@@ -14,10 +14,10 @@ function ContactCard({ chat, onClickFunction }) {
           bgcolor: "rgba(240,240,240)",
         },
       }}
-      id={chat.id}
+      id={chat.chat_id}
       onClick={onClickFunction}
     >
-      {chat.contact}
+      {chat.username}
     </Paper>
   );
 }

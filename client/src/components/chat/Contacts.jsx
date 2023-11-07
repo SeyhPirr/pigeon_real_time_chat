@@ -74,11 +74,11 @@ function Contacts() {
       </Paper>
       {chats.map((chat) => (
         <ContactCard
-          key={chat.id}
+          key={chat.chat_id}
           chat={chat}
           onClickFunction={(event) => {
             setChatViewID(event.target.id);
-            setCurrentContact(chat.contact);
+            setCurrentContact(chat.username);
           }}
         />
       ))}

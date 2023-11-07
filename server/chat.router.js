@@ -17,7 +17,7 @@ chat.post("/create", async (ctx) => {
 
     ctx.response.body = InsertedChat;
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
     ctx.response.body = { message: "You couldn`t create a chat." };
     ctx.response.status = 401;
   }

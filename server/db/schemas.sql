@@ -1,10 +1,9 @@
+use pigeon;
  CREATE TABLE user(
     username VARCHAR(255) UNIQUE NOT NULL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL
 );
-
-
 
 CREATE TABLE session(
     session_id VARCHAR(255) UNIQUE NOT NULL PRIMARY KEY,
@@ -21,17 +20,15 @@ CREATE TABLE participance(
 	id INTEGER auto_increment primary key,
     username VARCHAR(255) NOT NULL,
     chat_id VARCHAR(255) NOT NULL,
-    participance_type ENUM("individual","group") NOT NULL,
     FOREIGN KEY(username) REFERENCES user(username),
     FOREIGN KEY(chat_id) REFERENCES chat(id)
 );
-
 CREATE TABLE message(
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
     chat_id VARCHAR(255) NOT NULL,
     sender VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
-    creation_time VARCHAR(255) NOT NULL
+    creation_time VARCHAR(255) NOT NULL,
     FOREIGN KEY(chat_id) REFERENCES chat(id),
     FOREIGN KEY(sender) REFERENCES user(username)
 );
@@ -43,7 +40,8 @@ CREATE TABLE group_chat(
     FOREIGN KEY(chat_id) REFERENCES chat(id) 
 );
 CREATE TABLE group_participance(
-    participance_id INTEGER NOT NULL,
-    is_admin BOOLEAN NOT NULL,
-    FOREIGN KEY(participance_id) REFERENCES participance(id)
+participance_id INTEGER NOT NULL,
+ is_admin BOOLEAN NOT NULL,
+ FOREIGN KEY(participance_id) REFERENCES participance(id)
 );
+

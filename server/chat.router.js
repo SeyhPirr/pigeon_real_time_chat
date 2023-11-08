@@ -7,6 +7,7 @@ import {
   getChats,
   insertMessage,
   getMessages,
+  createGroup,
 } from "./db/dbservice.js";
 
 chat.post("/create", async (ctx) => {
@@ -15,6 +16,18 @@ chat.post("/create", async (ctx) => {
     const sessionId = await ctx.cookies.get("session");
     const InsertedChat = await createChat(sessionId, data.email);
 
+    ctx.response.body = InsertedChat;
+  } catch (err) {
+    console.log(err);
+    ctx.response.body = { message: "You couldn`t create a chat." };
+    ctx.response.status = 401;
+  }
+});
+chat.post("/group", async (ctx) => {
+  try {
+    const data = await ctx.request.body().value;
+    const sessionId = await ctx.cookies.get("session");
+    const InsertedChat = await createGroup(sessionId, data.groupName);
     ctx.response.body = InsertedChat;
   } catch (err) {
     console.log(err);

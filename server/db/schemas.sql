@@ -17,7 +17,7 @@ CREATE TABLE chat(
 );
 
 CREATE TABLE participance(
-	id INTEGER auto_increment primary key,
+	id VARCHAR(255) primary key,
     username VARCHAR(255) NOT NULL,
     chat_id VARCHAR(255) NOT NULL,
     FOREIGN KEY(username) REFERENCES user(username),
@@ -40,7 +40,7 @@ CREATE TABLE group_chat(
     FOREIGN KEY(chat_id) REFERENCES chat(id) 
 );
 CREATE TABLE group_participance(
-participance_id INTEGER NOT NULL,
+participance_id VARCHAR(255) NOT NULL ,
  is_admin BOOLEAN NOT NULL,
  FOREIGN KEY(participance_id) REFERENCES participance(id)
 );

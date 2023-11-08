@@ -44,6 +44,9 @@ export async function login(data) {
 }
 
 export async function createChat(session, email) {
+  const participanceID1 = uuid.v1.generate();
+  const participanceID2 = uuid.v1.generate();
+
   const { rows } = await client.execute(
     "SELECT * FROM session WHERE session_id=?",
     [session]
@@ -72,15 +75,22 @@ export async function createChat(session, email) {
   ]);
 
   await client.execute(
-    "INSERT INTO participance(username,chat_id) VALUES(?,?),(?,?)",
-    [participant_1, chatID, participant_2, chatID]
+    "INSERT INTO participance(id,username,chat_id) VALUES(?,?,?),(?,?,?)",
+    [
+      participanceID1,
+      participant_1,
+      chatID,
+      participanceID2,
+      participant_2,
+      chatID,
+    ]
   );
   return { chat_id: chatID, username: participant_2 };
 }
 
 export async function getChats(username) {
   const chatData = await client.execute(
-    "SELECT p.*, group_chat.group_name FROM participance p JOIN ( SELECT chat_id FROM participance WHERE username = ? ) AS subquery  ON p.chat_id = subquery.chat_id AND p.username <> ? LEFT JOIN group_chat  ON p.chat_id = group_chat.chat_id;",
+    "SELECT p.*, group_chat.group_name FROM participance p INNER JOIN ( SELECT chat_id FROM participance WHERE username =  ?) AS subquery  ON p.chat_id = subquery.chat_id AND p.username <> ? Right JOIN group_chat  ON p.chat_id = group_chat.chat_id; ",
     [username, username]
   );
   console.log(chatData.rows);
@@ -101,4 +111,33 @@ export async function getMessages(chat_id) {
     [chat_id]
   );
   return messageData.rows;
+}
+export async function createGroup(session, groupName) {
+  const { rows } = await client.execute(
+    "SELECT * FROM session WHERE session_id=?",
+    [session]
+  );
+  const participant = rows[0].username;
+  const chatID = uuid.v1.generate();
+  const participanceID = uuid.v1.generate();
+
+  await client.execute("INSERT INTO chat(id,chat_type) VALUES(?,?)", [
+    chatID,
+    "group",
+  ]);
+
+  await client.execute(
+    "INSERT INTO group_chat(chat_id, group_name) VALUES(?,?)",
+    [chatID, groupName]
+  );
+  await client.execute(
+    "INSERT INTO participance(id, username,chat_id) VALUES(?,?,?)",
+    [participanceID, participant, chatID]
+  );
+
+  await client.execute(
+    "INSERT INTO group_participance(participance_id, is_admin) VALUES(?,?)",
+    [participanceID, true]
+  );
+  return { chat_id: chatID, group_name: groupName };
 }

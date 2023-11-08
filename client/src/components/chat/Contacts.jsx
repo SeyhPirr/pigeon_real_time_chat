@@ -6,9 +6,17 @@ import { useState } from "react";
 import MapsUgcIcon from "@mui/icons-material/MapsUgc";
 import ContactCard from "./ContactCard";
 function Contacts() {
-  const { chats, setEmail, setChatViewID, setCurrentContact, createChat } =
-    useContext(Context);
+  const {
+    chats,
+    setEmail,
+    setChatViewID,
+    setCurrentContact,
+    createChat,
+    setGroupName,
+    createGroup,
+  } = useContext(Context);
   const [trigger, setTrigger] = useState(false);
+  const [groupTrigger, setGroupTrigger] = useState(false);
 
   return (
     <Paper
@@ -27,10 +35,27 @@ function Contacts() {
         <h1 style={{ color: "grey" }}>Contacts</h1>
         <MapsUgcIcon
           onClick={() => {
+            setGroupTrigger(false);
+
             setTrigger(!trigger);
           }}
           sx={{
             color: "blue",
+            top: "3vh",
+
+            ":hover": {
+              color: "red",
+            },
+          }}
+        />
+        <MapsUgcIcon
+          onClick={() => {
+            setTrigger(false);
+
+            setGroupTrigger(!groupTrigger);
+          }}
+          sx={{
+            color: "green",
             top: "3vh",
 
             ":hover": {
@@ -71,6 +96,39 @@ function Contacts() {
         ) : (
           ""
         )}
+        {groupTrigger ? (
+          <Box sx={{ position: "relative", top: "30px", right: "100px" }}>
+            <Input
+              sx={{
+                background: "rgba(255,255,255,0.6)",
+                width: "110%",
+                fontSize: "14px",
+              }}
+              placeholder="Start a group chat"
+              onChange={(event) => {
+                setGroupName(event.target.value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  createGroup();
+                  setGroupTrigger(false);
+                }
+              }}
+              type="text"
+            />
+            <Button
+              sx={{ position: "relative", left: "110%", bottom: "50%" }}
+              onClick={() => {
+                createGroup();
+                setGroupTrigger(false);
+              }}
+            >
+              Send
+            </Button>
+          </Box>
+        ) : (
+          ""
+        )}
       </Paper>
       {chats.map((chat) => (
         <ContactCard
@@ -78,7 +136,8 @@ function Contacts() {
           chat={chat}
           onClickFunction={(event) => {
             setChatViewID(event.target.id);
-            setCurrentContact(chat.username);
+            if (chat.username) setCurrentContact(chat.username);
+            setCurrentContact(chat.group_name);
           }}
         />
       ))}

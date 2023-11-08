@@ -15,6 +15,7 @@ function ChatContext(props) {
   const { openWebSocket, closeWebSocket, onMessage, webSocket } =
     UseWebsocket();
   const { getMessages, appendMessage } = useMessages();
+  const [groupName, setGroupName] = useState("");
   let messages;
 
   if (!messages) {
@@ -70,6 +71,29 @@ function ChatContext(props) {
       console.error(err);
     }
   }
+  async function createGroup() {
+    try {
+      const response = await fetch("http://localhost:8000/chat/group", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          groupName,
+        }),
+      });
+
+      const data = await response.json();
+      console.log(data);
+      if (response.status === 200) {
+        setChats([...chats, data]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   //get chats execute
   useEffect(() => {
     getChats();
@@ -112,6 +136,8 @@ function ChatContext(props) {
         setInputValue,
         notification,
         setNotification,
+        setGroupName,
+        createGroup,
       }}
     >
       <Box>{props.children}</Box>

@@ -17,7 +17,7 @@ function ContactCard({ chat, onClickFunction }) {
       id={chat.chat_id}
       onClick={onClickFunction}
     >
-      {chat.group_name ? chat.group_name : chat.username}
+      {chat.chat_name}
     </Paper>
   );
 }

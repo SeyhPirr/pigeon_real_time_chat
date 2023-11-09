@@ -136,8 +136,7 @@ function Contacts() {
           chat={chat}
           onClickFunction={(event) => {
             setChatViewID(event.target.id);
-            if (chat.username) setCurrentContact(chat.username);
-            setCurrentContact(chat.group_name);
+            setCurrentContact(chat.chat_name);
           }}
         />
       ))}

@@ -90,10 +90,10 @@ export async function createChat(session, email) {
 
 export async function getChats(username) {
   const chatData = await client.execute(
-    "SELECT p.*, group_chat.group_name FROM participance p INNER JOIN ( SELECT chat_id FROM participance WHERE username =  ?) AS subquery  ON p.chat_id = subquery.chat_id AND p.username <> ? Right JOIN group_chat  ON p.chat_id = group_chat.chat_id; ",
-    [username, username]
+    "SELECT p.username as chat_name, p.chat_id,null as is_admin FROM participance p JOIN (SELECT chat_id,id FROM participance WHERE username=?) AS subquery ON subquery.chat_id = p.chat_id AND p.username <> ? UNION SELECT g.group_name ,g.chat_id,group_participance.is_admin FROM group_chat g JOIN (SELECT chat_id,id FROM participance WHERE username=?)  AS subquery JOIN group_participance ON subquery.id =group_participance.participance_id AND subquery.chat_id=g.chat_id;",
+    [username, username, username]
   );
-  console.log(chatData.rows);
+  console.log("ROWS in DB:", chatData.rows);
   return chatData.rows;
 }
 
@@ -139,5 +139,5 @@ export async function createGroup(session, groupName) {
     "INSERT INTO group_participance(participance_id, is_admin) VALUES(?,?)",
     [participanceID, true]
   );
-  return { chat_id: chatID, group_name: groupName };
+  return { chat_id: chatID, chat_name: groupName };
 }

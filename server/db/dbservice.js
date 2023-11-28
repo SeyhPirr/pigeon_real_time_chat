@@ -90,8 +90,8 @@ export async function createChat(session, email) {
 
 export async function getChats(username) {
   const chatData = await client.execute(
-    "SELECT p.username as chat_name, p.chat_id,null as is_admin FROM participance p JOIN (SELECT chat_id,id FROM participance WHERE username=?) AS subquery ON subquery.chat_id = p.chat_id AND p.username <> ? UNION SELECT g.group_name ,g.chat_id,group_participance.is_admin FROM group_chat g JOIN (SELECT chat_id,id FROM participance WHERE username=?)  AS subquery JOIN group_participance ON subquery.id =group_participance.participance_id AND subquery.chat_id=g.chat_id;",
-    [username, username, username]
+    "SELECT p.username as chat_name, p.chat_id,null as is_admin,? as chat_type FROM participance p JOIN (SELECT chat_id,id FROM participance WHERE username=?) AS subquery ON subquery.chat_id = p.chat_id AND p.username <> ? UNION SELECT g.group_name ,g.chat_id,group_participance.is_admin,? FROM group_chat g JOIN (SELECT chat_id,id FROM participance WHERE username=?)  AS subquery JOIN group_participance ON subquery.id =group_participance.participance_id AND subquery.chat_id=g.chat_id;",
+    ["private", username, username, "group", username]
   );
   console.log("ROWS in DB:", chatData.rows);
   return chatData.rows;
@@ -140,4 +140,11 @@ export async function createGroup(session, groupName) {
     [participanceID, true]
   );
   return { chat_id: chatID, chat_name: groupName };
+}
+export async function getRecievers(chat_id) {
+  const { rows } = await client.execute(
+    "SELECT p.username FROM participance p WHERE p.chat_id = chat_id",
+    [chat_id]
+  );
+  return rows;
 }

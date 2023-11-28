@@ -1,5 +1,5 @@
 import React from "react";
-import { Paper, Box, Input } from "@mui/material";
+import { Paper, Box, Input, Button } from "@mui/material";
 import { Context } from "./ChatContext";
 import { useContext } from "react";
 import MessageList from "./MessageList";
@@ -14,7 +14,10 @@ function Chat() {
         sx={{ position: "absolute", left: "28%", width: "70%" }}
         elevation={2}
       >
-        <h1 style={{ color: "grey" }}>{currentContact}</h1>
+        <h1 style={{ color: "grey" }}>
+          {currentContact}
+          <Input sx={{ marginLeft: "20px" }} placeholder="add a participant" />
+        </h1>
       </Paper>
       <Paper
         sx={{

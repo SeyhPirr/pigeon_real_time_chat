@@ -8,6 +8,7 @@ import {
   insertMessage,
   getMessages,
   createGroup,
+  getRecievers,
 } from "./db/dbservice.js";
 
 chat.post("/create", async (ctx) => {
@@ -93,6 +94,7 @@ chat.get("/connect", async (ctx) => {
   socket.onmessage = async (m) => {
     const data = JSON.parse(m.data);
     if (data.event === "send-message") {
+      const Recievers = getRecievers(data.chat_id);
       await insertMessage({
         chat_id: data.chat_id,
         content: data.message,
@@ -100,16 +102,18 @@ chat.get("/connect", async (ctx) => {
       });
       const messageID = Date.now();
 
-      broadcast(
-        data.reciever,
-        username,
-        JSON.stringify({
-          id: messageID,
-          chat_id: data.chat_id,
-          sender: username,
-          content: data.message,
-        })
-      );
+      Recievers.forEach((reciever) => {
+        broadcast(
+          reciever,
+          username,
+          JSON.stringify({
+            id: messageID,
+            chat_id: data.chat_id,
+            sender: username,
+            content: data.message,
+          })
+        );
+      });
     }
   };
 });

@@ -54,9 +54,9 @@ chat.get("/", async (ctx) => {
 });
 let Clients = [];
 
-function broadcast(reciever, sender, message) {
+function broadcast(reciever, message) {
   Clients.forEach((client) => {
-    if (reciever === client.username || sender === client.username) {
+    if (reciever === client.username) {
       if (client.socket.readyState === 1) client.socket.send(message);
       else return;
     }
@@ -94,7 +94,8 @@ chat.get("/connect", async (ctx) => {
   socket.onmessage = async (m) => {
     const data = JSON.parse(m.data);
     if (data.event === "send-message") {
-      const Recievers = getRecievers(data.chat_id);
+      console.log("chat_id:", data.chat_id);
+      const Recievers = await getRecievers(data.chat_id);
       await insertMessage({
         chat_id: data.chat_id,
         content: data.message,
@@ -104,8 +105,7 @@ chat.get("/connect", async (ctx) => {
 
       Recievers.forEach((reciever) => {
         broadcast(
-          reciever,
-          username,
+          reciever.username,
           JSON.stringify({
             id: messageID,
             chat_id: data.chat_id,

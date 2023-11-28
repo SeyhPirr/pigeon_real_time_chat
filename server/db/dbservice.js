@@ -85,7 +85,7 @@ export async function createChat(session, email) {
       chatID,
     ]
   );
-  return { chat_id: chatID, username: participant_2 };
+  return { chat_id: chatID, chat_name: participant_2, chat_type: "private" };
 }
 
 export async function getChats(username) {
@@ -139,12 +139,13 @@ export async function createGroup(session, groupName) {
     "INSERT INTO group_participance(participance_id, is_admin) VALUES(?,?)",
     [participanceID, true]
   );
-  return { chat_id: chatID, chat_name: groupName };
+  return { chat_id: chatID, chat_name: groupName, chat_type: "group" };
 }
 export async function getRecievers(chat_id) {
   const { rows } = await client.execute(
-    "SELECT p.username FROM participance p WHERE p.chat_id = chat_id",
+    "SELECT p.username FROM participance p WHERE p.chat_id =?",
     [chat_id]
   );
+  console.log("participants:", rows);
   return rows;
 }

@@ -16,6 +16,7 @@ function ChatContext(props) {
     UseWebsocket();
   const { getMessages, appendMessage } = useMessages();
   const [groupName, setGroupName] = useState("");
+  const [chatType, setChatType] = useState("");
   let messages;
 
   if (!messages) {
@@ -138,6 +139,8 @@ function ChatContext(props) {
         setNotification,
         setGroupName,
         createGroup,
+        chatType,
+        setChatType,
       }}
     >
       <Box>{props.children}</Box>

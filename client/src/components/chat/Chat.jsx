@@ -4,7 +4,7 @@ import { Context } from "./ChatContext";
 import { useContext } from "react";
 import MessageList from "./MessageList";
 function Chat() {
-  const { currentContact, messages, setInputValue, sendMessage } =
+  const { currentContact, messages, setInputValue, sendMessage, chatType } =
     useContext(Context);
 
   //////***********************************************************
@@ -16,7 +16,14 @@ function Chat() {
       >
         <h1 style={{ color: "grey" }}>
           {currentContact}
-          <Input sx={{ marginLeft: "20px" }} placeholder="add a participant" />
+          {chatType === "group" ? (
+            <Input
+              sx={{ marginLeft: "20px" }}
+              placeholder="add a participant"
+            />
+          ) : (
+            ""
+          )}
         </h1>
       </Paper>
       <Paper

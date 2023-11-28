@@ -14,6 +14,7 @@ function Contacts() {
     createChat,
     setGroupName,
     createGroup,
+    setChatType,
   } = useContext(Context);
   const [trigger, setTrigger] = useState(false);
   const [groupTrigger, setGroupTrigger] = useState(false);
@@ -137,6 +138,7 @@ function Contacts() {
           onClickFunction={(event) => {
             setChatViewID(event.target.id);
             setCurrentContact(chat.chat_name);
+            setChatType(chat.chat_type);
           }}
         />
       ))}

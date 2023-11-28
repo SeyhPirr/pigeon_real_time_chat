@@ -85,16 +85,26 @@ export async function createChat(session, email) {
       chatID,
     ]
   );
-  return { chat_id: chatID, chat_name: participant_2, chat_type: "private" };
+  return { chat_id: chatID, chat_name: participant_2, chat_type: "individual" };
 }
 
 export async function getChats(username) {
-  const chatData = await client.execute(
-    "SELECT p.username as chat_name, p.chat_id,null as is_admin,? as chat_type FROM participance p JOIN (SELECT chat_id,id FROM participance WHERE username=?) AS subquery ON subquery.chat_id = p.chat_id AND p.username <> ? UNION SELECT g.group_name ,g.chat_id,group_participance.is_admin,? FROM group_chat g JOIN (SELECT chat_id,id FROM participance WHERE username=?)  AS subquery JOIN group_participance ON subquery.id =group_participance.participance_id AND subquery.chat_id=g.chat_id;",
-    ["private", username, username, "group", username]
+  // const chatData = await client.execute(
+  //   "SELECT p.username as chat_name, p.chat_id,null as is_admin,? as chat_type FROM participance p JOIN (SELECT pa.chat_id,pa.id,chat.chat_type as chat_type FROM participance pa JOIN chat ON chat.id=pa.chat_id WHERE username=? ) AS subquery ON subquery.chat_id = p.chat_id AND p.username <> ? UNION SELECT g.group_name ,g.chat_id,group_participance.is_admin,? FROM group_chat g JOIN (SELECT chat_id,id FROM participance WHERE username=?)  AS subquery JOIN group_participance ON subquery.id =group_participance.participance_id AND subquery.chat_id=g.chat_id;",
+  //   ["individual", username, username, "individual", "group", username]
+  // );
+  const privateChats = await client.execute(
+    "SELECT p.id, p.username as chat_name, p.chat_id,? as chat_type FROM participance p JOIN chat c ON p.chat_id = c.id WHERE p.chat_id IN ( SELECT chat_id FROM participance WHERE username = ?) AND p.username != ? AND c.chat_type = 'individual'; ",
+    ["individual", username, username]
   );
-  console.log("ROWS in DB:", chatData.rows);
-  return chatData.rows;
+  const groupChats = await client.execute(
+    "SELECT g.group_name as chat_name,g.chat_id,group_participance.is_admin,? as chat_type FROM group_chat g JOIN (SELECT chat_id,id FROM participance WHERE username=?)  AS subquery JOIN group_participance ON subquery.id =group_participance.participance_id AND subquery.chat_id=g.chat_id;",
+    ["group", username]
+  );
+  const concatenatedArray = privateChats.rows.concat(groupChats.rows);
+
+  console.log("ROWS in DB:", concatenatedArray);
+  return concatenatedArray;
 }
 
 export async function insertMessage(data) {
@@ -148,4 +158,17 @@ export async function getRecievers(chat_id) {
   );
   console.log("participants:", rows);
   return rows;
+}
+
+export async function insertGroupParticipant(newParticipant, chatID) {
+  const newParticipanceID = uuid.v1.generate();
+  await client.execute(
+    "INSERT INTO participance(id, username,chat_id) VALUES(?,?,?)",
+    [newParticipanceID, newParticipant, chatID]
+  );
+
+  await client.execute(
+    "INSERT INTO group_participance(participance_id, is_admin) VALUES(?,?)",
+    [newParticipanceID, true]
+  );
 }

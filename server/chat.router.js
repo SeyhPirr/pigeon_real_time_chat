@@ -9,6 +9,7 @@ import {
   getMessages,
   createGroup,
   getRecievers,
+  insertGroupParticipant,
 } from "./db/dbservice.js";
 
 chat.post("/create", async (ctx) => {
@@ -47,7 +48,7 @@ chat.get("/", async (ctx) => {
       ctx.response.body = { chats };
     }
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
     ctx.response.body = { message: "You are not authoritized." };
     ctx.response.status = 401;
   }
@@ -131,5 +132,23 @@ chat.get("/messages", async (ctx) => {
     ctx.response.body = { message: "You couldnt get messages." };
     ctx.response.status = 401;
   }
+});
+chat.post("/newParticipant", async (ctx) => {
+  try {
+    const data = await ctx.request.body().value;
+    console.log(data);
+    await insertGroupParticipant(data.newParticipant, data.chatID);
+    ctx.response.body = { message: "you added new participant" };
+  } catch (err) {
+    console.log(err);
+    ctx.response.body = { message: "You couldn`t add a new participant." };
+    ctx.response.status = 401;
+  }
+});
+chat.get("/username", async (ctx) => {
+  const sessionID = await ctx.cookies.get("session");
+  const dbResponse = await checkSession(sessionID);
+  console.log("USERNAME DBRESponse", dbResponse);
+  ctx.response.body = { dbResponse };
 });
 export default chat;

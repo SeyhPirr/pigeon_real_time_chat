@@ -17,6 +17,8 @@ function ChatContext(props) {
   const { getMessages, appendMessage } = useMessages();
   const [groupName, setGroupName] = useState("");
   const [chatType, setChatType] = useState("");
+  const [newParticipant, setNewParticipant] = useState("");
+  const [username, setUsername] = useState("");
   let messages;
 
   if (!messages) {
@@ -66,12 +68,53 @@ function ChatContext(props) {
       setChats(data.chats);
 
       if (response.status !== 200) {
-        navigation.navigate("/login");
+        //navigation.navigate("/login");
       }
     } catch (err) {
       console.error(err);
     }
   }
+  async function getUsername() {
+    try {
+      const response = await fetch("http://localhost:8000/chat/username", {
+        method: "GET",
+        headers: {
+          "content-type": "application/json",
+        },
+        credentials: "include",
+      });
+      const data = await response.json();
+      console.log("usernameDATa:", data);
+      setUsername(data.dbResponse.username);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function addGroupParticipant() {
+    try {
+      const response = await fetch(
+        "http://localhost:8000/chat/newParticipant",
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            newParticipant,
+            chatID: chatViewID,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      console.log(data);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   async function createGroup() {
     try {
       const response = await fetch("http://localhost:8000/chat/group", {
@@ -98,8 +141,10 @@ function ChatContext(props) {
   //get chats execute
   useEffect(() => {
     getChats();
+    getUsername();
   }, []);
   // create chat logic
+
   async function createChat() {
     try {
       const response = await fetch("http://localhost:8000/chat/create", {
@@ -122,6 +167,7 @@ function ChatContext(props) {
       console.error(err);
     }
   }
+
   return (
     <Context.Provider
       value={{
@@ -141,6 +187,9 @@ function ChatContext(props) {
         createGroup,
         chatType,
         setChatType,
+        setNewParticipant,
+        addGroupParticipant,
+        username,
       }}
     >
       <Box>{props.children}</Box>

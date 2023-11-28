@@ -4,8 +4,15 @@ import { Context } from "./ChatContext";
 import { useContext } from "react";
 import MessageList from "./MessageList";
 function Chat() {
-  const { currentContact, messages, setInputValue, sendMessage, chatType } =
-    useContext(Context);
+  const {
+    currentContact,
+    messages,
+    setInputValue,
+    sendMessage,
+    chatType,
+    setNewParticipant,
+    addGroupParticipant,
+  } = useContext(Context);
 
   //////***********************************************************
   return (
@@ -20,6 +27,14 @@ function Chat() {
             <Input
               sx={{ marginLeft: "20px" }}
               placeholder="add a participant"
+              onChange={(event) => {
+                setNewParticipant(event.target.value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  addGroupParticipant();
+                }
+              }}
             />
           ) : (
             ""

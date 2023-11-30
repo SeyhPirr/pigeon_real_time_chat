@@ -137,8 +137,11 @@ chat.post("/newParticipant", async (ctx) => {
   try {
     const data = await ctx.request.body().value;
     console.log(data);
-    await insertGroupParticipant(data.newParticipant, data.chatID);
-    ctx.response.body = { message: "you added new participant" };
+    const dbRespons = await insertGroupParticipant(
+      data.newParticipant,
+      data.chatID
+    );
+    ctx.response.body = { message: dbRespons };
   } catch (err) {
     console.log(err);
     ctx.response.body = { message: "You couldn`t add a new participant." };

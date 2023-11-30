@@ -89,10 +89,6 @@ export async function createChat(session, email) {
 }
 
 export async function getChats(username) {
-  // const chatData = await client.execute(
-  //   "SELECT p.username as chat_name, p.chat_id,null as is_admin,? as chat_type FROM participance p JOIN (SELECT pa.chat_id,pa.id,chat.chat_type as chat_type FROM participance pa JOIN chat ON chat.id=pa.chat_id WHERE username=? ) AS subquery ON subquery.chat_id = p.chat_id AND p.username <> ? UNION SELECT g.group_name ,g.chat_id,group_participance.is_admin,? FROM group_chat g JOIN (SELECT chat_id,id FROM participance WHERE username=?)  AS subquery JOIN group_participance ON subquery.id =group_participance.participance_id AND subquery.chat_id=g.chat_id;",
-  //   ["individual", username, username, "individual", "group", username]
-  // );
   const privateChats = await client.execute(
     "SELECT p.id, p.username as chat_name, p.chat_id,? as chat_type FROM participance p JOIN chat c ON p.chat_id = c.id WHERE p.chat_id IN ( SELECT chat_id FROM participance WHERE username = ?) AND p.username != ? AND c.chat_type = 'individual'; ",
     ["individual", username, username]
@@ -161,6 +157,12 @@ export async function getRecievers(chat_id) {
 }
 
 export async function insertGroupParticipant(newParticipant, chatID) {
+  const { rows } = client.execute(
+    "SELECT * FROM participance WHERE username=?",
+    [newParticipant]
+  );
+  if (rows && rows.length > 0 && rows[0]?.username)
+    return "participant already exists";
   const newParticipanceID = uuid.v1.generate();
   await client.execute(
     "INSERT INTO participance(id, username,chat_id) VALUES(?,?,?)",
@@ -171,4 +173,5 @@ export async function insertGroupParticipant(newParticipant, chatID) {
     "INSERT INTO group_participance(participance_id, is_admin) VALUES(?,?)",
     [newParticipanceID, true]
   );
+  return "you inserted succesfully";
 }

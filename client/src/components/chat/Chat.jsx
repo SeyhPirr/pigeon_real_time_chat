@@ -33,6 +33,7 @@ function Chat() {
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   addGroupParticipant();
+                  e.target.value = "";
                 }
               }}
             />

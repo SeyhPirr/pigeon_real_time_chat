@@ -1,3 +1,4 @@
+CREATE DATABASE pigeon;
 use pigeon;
  CREATE TABLE user(
     username VARCHAR(255) UNIQUE NOT NULL PRIMARY KEY,

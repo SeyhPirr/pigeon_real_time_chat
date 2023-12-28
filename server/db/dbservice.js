@@ -2,10 +2,11 @@ import { Client } from "https://deno.land/x/mysql/mod.ts";
 import * as uuid from "https://deno.land/std@0.194.0/uuid/mod.ts";
 
 export const client = await new Client().connect({
-  hostname: "localhost",
-  username: "root",
-  db: "pigeon",
-  password: "root123",
+  port: 3306,
+  hostname: "mysql_server",
+  username: "fazt",
+  password: "123456",
+  db: "fazt_db",
 });
 
 export async function assignSession(username) {

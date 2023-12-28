@@ -1,4 +1,4 @@
-import { Application, Router, send } from "https://deno.land/x/oak/mod.ts";
+import { Application, Router } from "https://deno.land/x/oak/mod.ts";
 import { oakCors } from "https://deno.land/x/cors/mod.ts";
 import account from "./account.router.js";
 import chat from "./chat.router.js";

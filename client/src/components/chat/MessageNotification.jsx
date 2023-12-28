@@ -11,20 +11,20 @@ function MessageNotification({ notification, setNotification }) {
         width: "15%",
         height: "20%",
         top: "0",
-        zIndex: "10px",
+        zIndex: "100px",
         borderRadius: "10px",
         color: "white",
         fontSize: "25px",
       }}
     >
       {notification}
-      <Button
+      <button
         onClick={() => {
           setNotification("");
         }}
       >
         close
-      </Button>
+      </button>
     </Box>
   );
 }

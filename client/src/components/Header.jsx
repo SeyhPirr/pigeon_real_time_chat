@@ -17,7 +17,7 @@ export default function Header() {
     >
       <FlutterDashSharpIcon
         sx={{
-          color: "blue",
+          color: "green",
           height: "100%",
           width: "4%",
           ":hover": {

@@ -1,12 +1,13 @@
 version: "3.4"
 services:
-  mysql_server:
-    image: mysql
+  postgres:
+    image: postgres
+    restart: always
     environment:
-      - MYSQL_USER=fazt
-      - MYSQL_PASSWORD=123456
-      - MYSQL_ROOT_PASSWORD=123456
-      - MYSQL_DATABASE=fazt_db
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_USER=postgres
+    ports:
+      - "5432:5432"
 
   client:
     build: ./client
@@ -20,8 +21,4 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - mysql_server
-    environment:
-      - MYSQL_HOST=mysql_server
-    links:
-      - mysql_server
+      - postgres

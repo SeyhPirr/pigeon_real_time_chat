@@ -1,13 +1,30 @@
-import { Client } from "https://deno.land/x/mysql/mod.ts";
 import * as uuid from "https://deno.land/std@0.194.0/uuid/mod.ts";
+import postgres from "https://deno.land/x/postgresjs@v3.4.3/mod.js";
 
-export const client = await new Client().connect({
-  port: 3306,
-  hostname: "mysql_server",
-  username: "fazt",
-  password: "123456",
-  db: "fazt_db",
-});
+const sql = postgres("postgres://postgres:123456@localhost:5432/postgres");
+
+export async function succesCheck() {
+  const userData = {
+    username: "example_user",
+    email: "user@example.com",
+    password: "securepassword",
+  };
+
+  // Construct the SQL query for insertion
+
+  const result =
+    await sql`INSERT INTO "user" (username, email, password) VALUES (${userData.username}, ${userData.email}, ${userData.password}) RETURNING *`;
+
+  return result;
+}
+
+// export const client = await new Client().connect({
+//   port: 3306,
+//   hostname: "mysql_server",
+//   username: "fazt",
+//   password: "",
+//   db: "fazt_db",
+// });
 
 export async function assignSession(username) {
   await client.execute("DELETE FROM session WHERE username=?", [username]);

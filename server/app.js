@@ -2,10 +2,15 @@ import { Application, Router } from "https://deno.land/x/oak/mod.ts";
 import { oakCors } from "https://deno.land/x/cors/mod.ts";
 import account from "./account.router.js";
 import chat from "./chat.router.js";
-
+import { succesCheck } from "./db/dbservice.js";
 const app = new Application();
 const accountRouter = new Router().use("/account", account.routes());
 const chatRouter = new Router().use("/chat", chat.routes());
+
+app.use(async (ctx) => {
+  ctx.response.body = await succesCheck();
+});
+
 app.use(
   oakCors({
     preflightContinue: false,

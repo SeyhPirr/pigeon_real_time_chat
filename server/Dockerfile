@@ -8,4 +8,4 @@ COPY . .
 EXPOSE 8000
 
 
-CMD ["run", "--allow-net", "app.js"]
+CMD ["run", "-A", "--watch", "app.js"]
